@@ -1,9 +1,14 @@
-import { ISwaggerContact } from "src/interfaces/swagger-contact.interface";
-import { ISwaggerExternalDocs } from "src/interfaces/swagger-external-docs.interface";
-import { ISwaggerLicense } from "src/interfaces/swagger-license.interface";
-import { ISwaggerSecurityScheme } from "src/interfaces/swagger-security-scheme.interface";
-import { ISwaggerConfig } from "../interfaces/swagger-config.interface";
+import {
+  ISwaggerConfig,
+  ISwaggerContact,
+  ISwaggerExternalDocs,
+  ISwaggerLicense,
+  ISwaggerSecurityScheme,
+} from "./interfaces";
 
+/**
+ * Generate swagger config
+ */
 export class SwaggerConfig {
   private swaggerJSONConfig: ISwaggerConfig;
   constructor() {
@@ -21,63 +26,82 @@ export class SwaggerConfig {
   }
 
   /**
+   * Set title for swagger document
+   * @param title - Title for swagger document
    *
-   * @param title
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#infoObject
    */
-  public setTitle(title: string) {
+  public setTitle(title: string): this {
     this.swaggerJSONConfig.info.title = title;
     return this;
   }
 
   /**
+   * Set description for swagger document
+   * @param description - Description for swagger document
    *
-   * @param description
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#infoObject
    */
-  public setDescription(description: string) {
+  public setDescription(description: string): this {
     this.swaggerJSONConfig.info.description = description;
     return this;
   }
 
   /**
+   * Add terms of service (TOS) URL to swagger document
+   * @param tosUrl - Terms of service url
+   *
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#infoObject
    */
-  public termsOfService(tosUrl: string) {
+  public termsOfService(tosUrl: string): this {
     this.swaggerJSONConfig.info.termsOfService = tosUrl;
     return this;
   }
 
   /**
+   * Set swagger document version
+   * @param version - Version number for swagger document
+   *
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#infoObject
    */
-  public setVersion(version: string) {
+  public setVersion(version: string): this {
     this.swaggerJSONConfig.info.version = version;
     return this;
   }
 
   /**
+   * Add contact info to swagger document
+   * @param {ISwaggerContact} data - Swagger contact details
+   *
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#contactObject
    */
-  public addContactInfo(data: ISwaggerContact) {
+  public addContactInfo(data: ISwaggerContact): this {
     this.swaggerJSONConfig.info.contact = data;
     return this;
   }
 
   /**
+   * Add license information to swagger document
+   * @param {ISwaggerLicense} data - Swagger license information
    *
-   * @param data
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#licenseObject
    */
-  public addLicenseInfo(data: ISwaggerLicense) {
+  public addLicenseInfo(data: ISwaggerLicense): this {
     this.swaggerJSONConfig.info.license = data;
     return this;
   }
 
   /**
+   * Add security schema to swagger document
+   * @param {string} securitySchemeName - Name for security schema
+   * @param {ISwaggerSecurityScheme} data - Security schema details
+   *
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#componentsSecuritySchemes
    */
-  public addSecurity(securitySchemeName: string, data: ISwaggerSecurityScheme) {
+  public addSecurity(
+    securitySchemeName: string,
+    data: ISwaggerSecurityScheme
+  ): this {
     const securitySchema = { [securitySchemeName]: data };
     if (!this.swaggerJSONConfig?.components?.securitySchemes) {
       this.swaggerJSONConfig.components = {
@@ -93,24 +117,38 @@ export class SwaggerConfig {
   }
 
   /**
+   * Add security requirements to swagger open apis
+   * @param {string} securitySchemaName - Name of security schema
+   * @param {string[]} requirements - Security requirements. Useful only for oauth security schema type for other security schemas should be empty array
+   *
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#securityRequirementObject
    */
   public addSecurityRequirement(
     securitySchemaName: string,
     requirements: string[]
-  ) {
+  ): this {
     const securityObject = { [securitySchemaName]: requirements };
     this.swaggerJSONConfig.security.push(securityObject);
     return this;
   }
 
   /**
-   *
-   * @param data
+   * Add external documentation links to swagger
+   * @param {ISwaggerExternalDocs} data - External documents details
+   * 
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#externalDocumentationObject
    */
-  public addExternalDocumentation(data: ISwaggerExternalDocs) {
+  public addExternalDocumentation(data: ISwaggerExternalDocs): this {
     this.swaggerJSONConfig.externalDocs = data;
     return this;
+  }
+
+  /**
+   * Finalize and return swagger document config
+   * @returns ISwaggerConfig
+   */
+  public finalizeConfig(): ISwaggerConfig {
+    Object.freeze(this.swaggerJSONConfig);
+    return this.swaggerJSONConfig;
   }
 }
