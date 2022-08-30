@@ -2,7 +2,11 @@ import type { Express, Request, Response } from "express";
 import * as fs from "fs";
 import { access } from "fs/promises";
 import { absolutePath } from "swagger-ui-dist";
-import { favIconsString, htmlString, jsString } from "./constants";
+import {
+  favIconsString,
+  htmlString,
+  jsString,
+} from "./constants/swagger.constants";
 import {
   IBuildSwaggerHtml,
   IBuildSwaggerJS,
