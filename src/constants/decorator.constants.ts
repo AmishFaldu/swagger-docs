@@ -1,16 +1,9 @@
 export const enum DECORATOR_METADATA_ENUM {
   CONTROLLER = "__swagger-docs.controller__",
 
-  GET_ROUTE = "__swagger-docs.route.get__",
-  PUT_ROUTE = "__swagger-docs.route.put__",
-  POST_ROUTE = "__swagger-docs.route.post__",
-  DELETE_ROUTE = "__swagger-docs.route.delete__",
-  OPTIONS_ROUTE = "__swagger-docs.route.options__",
-  HEAD_ROUTE = "__swagger-docs.route.head__",
-  PATCH_ROUTE = "__swagger-docs.route.patch__",
-  TRACE_ROUTE = "__swagger-docs.route.trace__",
+  ROUTE_HANDLER_METADATA = "__swagger-docs.route.metadata__",
+  ROUTE_HANDLER_ARGS = "__swagger-docs.route.args__",
 
-  ROUTE_ARGS = "__swagger-docs.route.args__",
   PATH_PARAM = "__swagger-docs.route.path.param__",
   QUERY_PARAM = "__swagger-docs.route.query.param__",
   BODY = "__swagger-docs.route.body__",

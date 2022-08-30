@@ -1,34 +1,131 @@
 import "reflect-metadata";
-import { DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
+import { IRouteHandlerMetadata } from "src/interfaces";
+import { DECORATOR_METADATA_ENUM } from "../constants";
 
-export const Get = (routePath: string = "") => {
-  return Reflect.metadata(DECORATOR_METADATA_ENUM.GET_ROUTE, routePath);
+export const Get = (
+  routePath: string = ""
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+} => {
+  const routeHandlerMetadata: IRouteHandlerMetadata = {
+    method: "GET",
+    path: routePath,
+  };
+  return Reflect.metadata(
+    DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
+    routeHandlerMetadata
+  );
 };
 
-export const Put = (routePath: string = "") => {
-  return Reflect.metadata(DECORATOR_METADATA_ENUM.PUT_ROUTE, routePath);
+export const Put = (
+  routePath: string = ""
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+} => {
+  const routeHandlerMetadata: IRouteHandlerMetadata = {
+    method: "PUT",
+    path: routePath,
+  };
+  return Reflect.metadata(
+    DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
+    routeHandlerMetadata
+  );
 };
 
-export const Post = (routePath: string = "") => {
-  return Reflect.metadata(DECORATOR_METADATA_ENUM.POST_ROUTE, routePath);
+export const Post = (
+  routePath: string = ""
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+} => {
+  const routeHandlerMetadata: IRouteHandlerMetadata = {
+    method: "POST",
+    path: routePath,
+  };
+  return Reflect.metadata(
+    DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
+    routeHandlerMetadata
+  );
 };
 
-export const Delete = (routePath: string = "") => {
-  return Reflect.metadata(DECORATOR_METADATA_ENUM.DELETE_ROUTE, routePath);
+export const Delete = (
+  routePath: string = ""
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+} => {
+  const routeHandlerMetadata: IRouteHandlerMetadata = {
+    method: "DELETE",
+    path: routePath,
+  };
+  return Reflect.metadata(
+    DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
+    routeHandlerMetadata
+  );
 };
 
-export const Options = (routePath: string = "") => {
-  return Reflect.metadata(DECORATOR_METADATA_ENUM.OPTIONS_ROUTE, routePath);
+export const Options = (
+  routePath: string = ""
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+} => {
+  const routeHandlerMetadata: IRouteHandlerMetadata = {
+    method: "OPTIONS",
+    path: routePath,
+  };
+  return Reflect.metadata(
+    DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
+    routeHandlerMetadata
+  );
 };
 
-export const Head = (routePath: string = "") => {
-  return Reflect.metadata(DECORATOR_METADATA_ENUM.HEAD_ROUTE, routePath);
+export const Head = (
+  routePath: string = ""
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+} => {
+  const routeHandlerMetadata: IRouteHandlerMetadata = {
+    method: "HEAD",
+    path: routePath,
+  };
+  return Reflect.metadata(
+    DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
+    routeHandlerMetadata
+  );
 };
 
-export const Patch = (routePath: string = "") => {
-  return Reflect.metadata(DECORATOR_METADATA_ENUM.PATCH_ROUTE, routePath);
+export const Patch = (
+  routePath: string = ""
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+} => {
+  const routeHandlerMetadata: IRouteHandlerMetadata = {
+    method: "PATCH",
+    path: routePath,
+  };
+  return Reflect.metadata(
+    DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
+    routeHandlerMetadata
+  );
 };
 
-export const Trace = (routePath: string = "") => {
-  return Reflect.metadata(DECORATOR_METADATA_ENUM.TRACE_ROUTE, routePath);
+export const Trace = (
+  routePath: string = ""
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+} => {
+  const routeHandlerMetadata: IRouteHandlerMetadata = {
+    method: "TRACE",
+    path: routePath,
+  };
+  return Reflect.metadata(
+    DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
+    routeHandlerMetadata
+  );
 };

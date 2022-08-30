@@ -1,6 +1,12 @@
 import "reflect-metadata";
-import { DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
+import { IControllerMetadata } from "src/interfaces";
+import { DECORATOR_METADATA_ENUM } from "../constants";
 
-export const Controller = (controllerData: { route: string }) => {
+export const Controller = (
+  controllerData: IControllerMetadata
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+} => {
   return Reflect.metadata(DECORATOR_METADATA_ENUM.CONTROLLER, controllerData);
 };
