@@ -1,131 +1,131 @@
 import "reflect-metadata";
-import { IRouteHandlerMetadata } from "src/interfaces";
 import { DECORATOR_METADATA_ENUM } from "../constants";
+import { IRouteHandlerMetadata } from "../interfaces";
 
-export const Get = (
-  routePath: string = ""
-): {
-  (target: Function): void;
-  (target: Object, propertyKey: string | symbol): void;
-} => {
+/**
+ * Get route method for route handler in controller
+ * @param routePath - Route path associated with handler
+ * @returns Typescript method decorator
+ */
+export const Get = (routePath = ""): PropertyDecorator => {
   const routeHandlerMetadata: IRouteHandlerMetadata = {
     method: "GET",
     path: routePath,
   };
   return Reflect.metadata(
     DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
-    routeHandlerMetadata
+    routeHandlerMetadata,
   );
 };
 
-export const Put = (
-  routePath: string = ""
-): {
-  (target: Function): void;
-  (target: Object, propertyKey: string | symbol): void;
-} => {
+/**
+ * Put route method for route handler in controller
+ * @param routePath - Route path associated with handler
+ * @returns Typescript method decorator
+ */
+export const Put = (routePath = ""): PropertyDecorator => {
   const routeHandlerMetadata: IRouteHandlerMetadata = {
     method: "PUT",
     path: routePath,
   };
   return Reflect.metadata(
     DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
-    routeHandlerMetadata
+    routeHandlerMetadata,
   );
 };
 
-export const Post = (
-  routePath: string = ""
-): {
-  (target: Function): void;
-  (target: Object, propertyKey: string | symbol): void;
-} => {
+/**
+ * Post route method for route handler in controller
+ * @param routePath - Route path associated with handler
+ * @returns Typescript method decorator
+ */
+export const Post = (routePath = ""): PropertyDecorator => {
   const routeHandlerMetadata: IRouteHandlerMetadata = {
     method: "POST",
     path: routePath,
   };
   return Reflect.metadata(
     DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
-    routeHandlerMetadata
+    routeHandlerMetadata,
   );
 };
 
-export const Delete = (
-  routePath: string = ""
-): {
-  (target: Function): void;
-  (target: Object, propertyKey: string | symbol): void;
-} => {
+/**
+ * Delete route method for route handler in controller
+ * @param routePath - Route path associated with handler
+ * @returns Typescript method decorator
+ */
+export const Delete = (routePath = ""): PropertyDecorator => {
   const routeHandlerMetadata: IRouteHandlerMetadata = {
     method: "DELETE",
     path: routePath,
   };
   return Reflect.metadata(
     DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
-    routeHandlerMetadata
+    routeHandlerMetadata,
   );
 };
 
-export const Options = (
-  routePath: string = ""
-): {
-  (target: Function): void;
-  (target: Object, propertyKey: string | symbol): void;
-} => {
+/**
+ * Options route method for route handler in controller
+ * @param routePath - Route path associated with handler
+ * @returns Typescript method decorator
+ */
+export const Options = (routePath = ""): PropertyDecorator => {
   const routeHandlerMetadata: IRouteHandlerMetadata = {
     method: "OPTIONS",
     path: routePath,
   };
   return Reflect.metadata(
     DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
-    routeHandlerMetadata
+    routeHandlerMetadata,
   );
 };
 
-export const Head = (
-  routePath: string = ""
-): {
-  (target: Function): void;
-  (target: Object, propertyKey: string | symbol): void;
-} => {
+/**
+ * Head route method for route handler in controller
+ * @param routePath - Route path associated with handler
+ * @returns Typescript method decorator
+ */
+export const Head = (routePath = ""): PropertyDecorator => {
   const routeHandlerMetadata: IRouteHandlerMetadata = {
     method: "HEAD",
     path: routePath,
   };
   return Reflect.metadata(
     DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
-    routeHandlerMetadata
+    routeHandlerMetadata,
   );
 };
 
-export const Patch = (
-  routePath: string = ""
-): {
-  (target: Function): void;
-  (target: Object, propertyKey: string | symbol): void;
-} => {
+/**
+ * Patch route method for route handler in controller
+ * @param routePath - Route path associated with handler
+ * @returns Typescript method decorator
+ */
+export const Patch = (routePath = ""): PropertyDecorator => {
   const routeHandlerMetadata: IRouteHandlerMetadata = {
     method: "PATCH",
     path: routePath,
   };
   return Reflect.metadata(
     DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
-    routeHandlerMetadata
+    routeHandlerMetadata,
   );
 };
 
-export const Trace = (
-  routePath: string = ""
-): {
-  (target: Function): void;
-  (target: Object, propertyKey: string | symbol): void;
-} => {
+/**
+ * Trace route method for route handler in controller
+ * @param routePath - Route path associated with handler
+ * @returns Typescript method decorator
+ */
+export const Trace = (routePath = ""): PropertyDecorator => {
   const routeHandlerMetadata: IRouteHandlerMetadata = {
     method: "TRACE",
     path: routePath,
   };
   return Reflect.metadata(
     DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
-    routeHandlerMetadata
+    routeHandlerMetadata,
   );
 };

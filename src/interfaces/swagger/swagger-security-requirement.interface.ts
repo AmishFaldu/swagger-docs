@@ -1,3 +1,3 @@
 export interface ISwaggerSecurityRequirement {
-  [key: string]: string[];
+  [key: string]: readonly string[];
 }

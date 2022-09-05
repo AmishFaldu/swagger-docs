@@ -1,12 +1,15 @@
 import "reflect-metadata";
-import { IControllerMetadata } from "src/interfaces";
 import { DECORATOR_METADATA_ENUM } from "../constants";
+import { IControllerMetadata } from "../interfaces";
 
+/**
+ * Controller decorator to define router for http route handlers.
+ * Attaches reflect metadata to class defination
+ * @param controllerData - Controller metadata
+ * @returns Class decorator
+ */
 export const Controller = (
-  controllerData: IControllerMetadata
-): {
-  (target: Function): void;
-  (target: Object, propertyKey: string | symbol): void;
-} => {
+  controllerData: Readonly<IControllerMetadata>,
+): ClassDecorator => {
   return Reflect.metadata(DECORATOR_METADATA_ENUM.CONTROLLER, controllerData);
 };

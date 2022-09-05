@@ -8,6 +8,7 @@ import {
   jsString,
 } from "./constants/swagger.constants";
 import {
+  DeepReadonly,
   IBuildSwaggerHtml,
   IBuildSwaggerJS,
   ISwaggerConfig,
@@ -19,11 +20,49 @@ import {
  */
 export class SwaggerDocs {
   private formattedSwaggerHtml: string;
-  private formattedSwaggerJs: string;
-  private swaggerUIDistAbsolutePath: string;
 
-  constructor() {
+  private formattedSwaggerJs: string;
+
+  private readonly swaggerUIDistAbsolutePath: string;
+
+  private readonly swaggerUIConfig: ISwaggerUIConfig;
+
+  constructor(
+    private readonly swaggerConfig: DeepReadonly<ISwaggerConfig>,
+    swaggerUIConfig: Readonly<ISwaggerUIConfig> = {},
+  ) {
+    this.swaggerUIConfig = this.addDefaultsToSwaggerUIConfig(swaggerUIConfig);
     this.swaggerUIDistAbsolutePath = absolutePath();
+  }
+
+  /**
+   * Setup Swagger UI on web framework
+   * @param app - Instance of express app
+   * @param path - Route path for accessing swagger UI
+   */
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  public setup(app: Express, path: Readonly<string>): void {
+    const baseUrl = this.getFormattedPath(path);
+    const formattedFavIconsString = this.buildSwaggerFavIcons(baseUrl);
+
+    this.formattedSwaggerJs = this.buildSwaggerJs({
+      displayRequestDuration: this.swaggerUIConfig.displayRequestDuration,
+      filter: this.swaggerUIConfig.filter,
+      spec: JSON.stringify(this.swaggerConfig),
+      tryItOutEnabled: this.swaggerUIConfig.tryItOutEnabled,
+    });
+
+    this.formattedSwaggerHtml = this.buildSwaggerHtml({
+      customTitle: this.swaggerUIConfig.customTitle,
+      favIconsString: formattedFavIconsString,
+      baseUrl,
+      customCss: this.swaggerUIConfig.customCss,
+      customCssStyle: this.swaggerUIConfig.customCssStyle,
+      customJs: this.swaggerUIConfig.customJs,
+      customJsString: this.swaggerUIConfig.customJsString,
+    });
+
+    this.setupSwaggerExpress(app, path);
   }
 
   /**
@@ -31,17 +70,24 @@ export class SwaggerDocs {
    * @param swaggerUIConfig - Swagger UI config object
    */
   private addDefaultsToSwaggerUIConfig(
-    swaggerUIConfig: ISwaggerUIConfig
-  ): void {
-    swaggerUIConfig.customCss = swaggerUIConfig.customCss || "";
-    swaggerUIConfig.customCssStyle = swaggerUIConfig.customCssStyle || "";
-    swaggerUIConfig.customJs = swaggerUIConfig.customJs || "";
-    swaggerUIConfig.customJsString = swaggerUIConfig.customJsString || "";
-    swaggerUIConfig.customTitle = swaggerUIConfig.customTitle || "Swagger UI";
-    swaggerUIConfig.displayRequestDuration =
-      swaggerUIConfig.displayRequestDuration || false;
-    swaggerUIConfig.filter = swaggerUIConfig.filter || false;
-    swaggerUIConfig.tryItOutEnabled = swaggerUIConfig.tryItOutEnabled || false;
+    swaggerUIConfig: Readonly<ISwaggerUIConfig>,
+  ): ISwaggerUIConfig {
+    const updatedSwaggerUIConfig = { ...swaggerUIConfig };
+
+    updatedSwaggerUIConfig.customCss = updatedSwaggerUIConfig.customCss ?? "";
+    updatedSwaggerUIConfig.customCssStyle =
+      updatedSwaggerUIConfig.customCssStyle ?? "";
+    updatedSwaggerUIConfig.customJs = updatedSwaggerUIConfig.customJs ?? "";
+    updatedSwaggerUIConfig.customJsString =
+      updatedSwaggerUIConfig.customJsString ?? "";
+    updatedSwaggerUIConfig.customTitle =
+      updatedSwaggerUIConfig.customTitle ?? "Swagger UI";
+    updatedSwaggerUIConfig.displayRequestDuration =
+      updatedSwaggerUIConfig.displayRequestDuration ?? false;
+    updatedSwaggerUIConfig.filter = updatedSwaggerUIConfig.filter ?? false;
+    updatedSwaggerUIConfig.tryItOutEnabled =
+      updatedSwaggerUIConfig.tryItOutEnabled ?? false;
+    return updatedSwaggerUIConfig;
   }
 
   /**
@@ -50,9 +96,12 @@ export class SwaggerDocs {
    * @returns Formatted URL path
    */
   private getFormattedPath(path: string): string {
-    let formattedPath = path.slice(0, 1) === "/" ? path : `/${path}`;
-    formattedPath =
-      formattedPath.slice(-1) === "/" ? formattedPath : `${formattedPath}/`;
+    let formattedPath = path.startsWith("/")
+      ? path
+      : `/${path}`;
+    formattedPath = formattedPath.endsWith("/")
+      ? formattedPath
+      : `${formattedPath}/`;
     return formattedPath;
   }
 
@@ -61,12 +110,10 @@ export class SwaggerDocs {
    * @param {IBuildSwaggerHtml} buildObject - Object to build Swagger HTML
    * @returns Formatted Swagger HTML UI template code string
    */
-  private buildSwaggerHtml(buildObject: IBuildSwaggerHtml): string {
-    return Object.keys(buildObject).reduce(
-      (pvalue, cvalue) =>
-        pvalue.replaceAll(`{{${cvalue}}}`, buildObject[cvalue]),
-      `${htmlString}`
-    );
+  private buildSwaggerHtml(buildObject: Readonly<IBuildSwaggerHtml>): string {
+    return Object.keys(buildObject).reduce((pvalue, cvalue) => {
+      return pvalue.replaceAll(`{{${cvalue}}}`, buildObject[cvalue]);
+    }, `${htmlString}`);
   }
 
   /**
@@ -79,17 +126,26 @@ export class SwaggerDocs {
     filter,
     spec,
     tryItOutEnabled,
-  }: IBuildSwaggerJS): string {
+  }: Readonly<IBuildSwaggerJS>): string {
     let modifiedJsString = `${jsString}`;
 
     modifiedJsString = modifiedJsString
       .replaceAll("{{spec}}", spec)
       .replaceAll(
         "{{displayRequestDuration}}",
-        displayRequestDuration ? "true" : "false"
+        displayRequestDuration === true
+          ? "true"
+          : "false",
       )
-      .replaceAll("{{filter}}", filter ? "true" : "false")
-      .replaceAll("{{tryItOutEnabled}}", tryItOutEnabled ? "true" : "false");
+      .replaceAll("{{filter}}", filter === true
+        ? "true"
+        : "false")
+      .replaceAll(
+        "{{tryItOutEnabled}}",
+        tryItOutEnabled === true
+          ? "true"
+          : "false",
+      );
     return modifiedJsString;
   }
 
@@ -102,7 +158,7 @@ export class SwaggerDocs {
     let modifiedFavIconsString = `${favIconsString}`;
     modifiedFavIconsString = modifiedFavIconsString.replaceAll(
       "{{baseUrl}}",
-      baseUrl
+      baseUrl,
     );
     return modifiedFavIconsString;
   }
@@ -112,25 +168,34 @@ export class SwaggerDocs {
    * @param app - Instance of express app
    * @param path - Route path for accessing swagger UI
    */
-  private setupSwaggerExpress(app: Express, path: string): void {
+  private setupSwaggerExpress(
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    app: Express,
+    path: Readonly<string>,
+  ): void {
     const formattedPath = this.getFormattedPath(path);
 
-    app.get(formattedPath, (_req, res) => {
-      return res.send(this.formattedSwaggerHtml);
-    });
+    app.get(
+      formattedPath,
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      (_req: Request, res: Response) => {
+        return res.send(this.formattedSwaggerHtml);
+      },
+    );
 
     app.get(
       `${formattedPath}swagger-initializer.js`,
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       (_req: Request, res: Response) => {
         return res.send(this.formattedSwaggerJs);
-      }
+      },
     );
 
     app.use(
-      formattedPath + ":filePath",
+      `${formattedPath}:filePath`,
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       async (req: Request, res: Response) => {
-        const filepath =
-          this.swaggerUIDistAbsolutePath + "/" + req.params.filePath;
+        const filepath = `${this.swaggerUIDistAbsolutePath}/${req.params.filePath}`;
 
         try {
           await access(filepath, fs.constants.R_OK);
@@ -139,44 +204,7 @@ export class SwaggerDocs {
         }
 
         return fs.createReadStream(filepath).pipe(res);
-      }
+      },
     );
-  }
-
-  /**
-   * Setup Swagger UI on web framework
-   * @param app - Instance of express app
-   * @param path - Route path for accessing swagger UI
-   * @param {ISwaggerConfig} swaggerConfig - Swagger config object
-   * @param {ISwaggerUIConfig} swaggerUIConfig - Swagger UI config object
-   */
-  public setup(
-    app: Express,
-    path: string,
-    swaggerConfig: ISwaggerConfig,
-    swaggerUIConfig: ISwaggerUIConfig = {}
-  ): void {
-    const baseUrl = this.getFormattedPath(path);
-    this.addDefaultsToSwaggerUIConfig(swaggerUIConfig);
-    const formattedFavIconsString = this.buildSwaggerFavIcons(baseUrl);
-
-    this.formattedSwaggerJs = this.buildSwaggerJs({
-      displayRequestDuration: swaggerUIConfig.displayRequestDuration,
-      filter: swaggerUIConfig.filter,
-      spec: JSON.stringify(swaggerConfig),
-      tryItOutEnabled: swaggerUIConfig.tryItOutEnabled,
-    });
-
-    this.formattedSwaggerHtml = this.buildSwaggerHtml({
-      customTitle: swaggerUIConfig.customTitle,
-      favIconsString: formattedFavIconsString,
-      baseUrl,
-      customCss: swaggerUIConfig.customCss,
-      customCssStyle: swaggerUIConfig.customCssStyle,
-      customJs: swaggerUIConfig.customJs,
-      customJsString: swaggerUIConfig.customJsString,
-    });
-
-    this.setupSwaggerExpress(app, path);
   }
 }

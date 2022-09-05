@@ -14,8 +14,8 @@ export interface ISwaggerParameter {
   style?: SwaggerStyleType;
   explode?: boolean;
   allowReserved?: boolean;
-  schema?: ISwaggerSchema | ISwaggerReferenceSchema;
-  example?: any;
+  schema?: ISwaggerReferenceSchema | ISwaggerSchema;
+  example?: unknown;
   examples?: {
     [key: string]: ISwaggerExample | ISwaggerReferenceSchema;
   };

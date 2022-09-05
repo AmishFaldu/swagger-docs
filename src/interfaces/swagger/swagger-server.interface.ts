@@ -9,5 +9,5 @@ export interface ISwaggerServer {
   description?: string;
   variables?: {
     [key: string]: ISwaggerServerVariable;
-  }
+  };
 }

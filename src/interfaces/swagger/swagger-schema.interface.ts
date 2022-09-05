@@ -4,23 +4,10 @@ import { ISwaggerReferenceSchema } from "./swagger-reference-schema.interface";
 import { ISwaggerXML } from "./swagger-xml.interface";
 
 type DataTypesSuported =
-  | "integer"
-  | "number"
-  | "string"
-  | "boolean"
-  | "array"
-  | "objeect";
+  "array" | "boolean" | "integer" | "number" | "objeect" | "string";
 
 type DataTypeFormatsSupported =
-  | "int32"
-  | "int64"
-  | "float"
-  | "double"
-  | "byte"
-  | "binary"
-  | "date"
-  | "date-time"
-  | "password";
+  "binary" | "byte" | "date-time" | "date" | "double" | "float" | "int32" | "int64" | "password";
 
 export interface ISwaggerSchema {
   title?: string;
@@ -37,7 +24,7 @@ export interface ISwaggerSchema {
   uniqueItems?: string;
   maxProperties?: string;
   minProperties?: string;
-  required?: boolean | string[];
+  required?: string[] | boolean;
   enum?: string[];
   type: DataTypesSuported;
   allOf?: (ISwaggerReferenceSchema | ISwaggerSchema)[];
@@ -46,18 +33,18 @@ export interface ISwaggerSchema {
   not?: (ISwaggerReferenceSchema | ISwaggerSchema)[];
   items?: ISwaggerReferenceSchema | ISwaggerSchema;
   properties?: {
-    [key: string]: ISwaggerSchema | ISwaggerReferenceSchema;
+    [key: string]: ISwaggerReferenceSchema | ISwaggerSchema;
   };
-  additionalProperties?: boolean | ISwaggerSchema | ISwaggerReferenceSchema;
+  additionalProperties?: ISwaggerReferenceSchema | ISwaggerSchema | boolean;
   description?: string;
-  format?: DataTypeFormatsSupported | string;
-  default?: any;
+  format?: DataTypeFormatsSupported;
+  default?: unknown;
   nullable?: boolean;
   discriminator?: ISwaggerDiscriminator;
   readOnly?: boolean;
   writeOnly?: string;
   xml?: ISwaggerXML;
   externalDocs?: ISwaggerExternalDocs;
-  example?: any;
+  example?: unknown;
   deprecated?: boolean;
 }

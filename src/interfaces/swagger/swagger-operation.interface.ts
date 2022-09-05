@@ -14,7 +14,7 @@ export interface ISwaggerOperation {
   externalDocs?: ISwaggerExternalDocs;
   operationId?: string;
   parameters?: (ISwaggerParameter | ISwaggerReferenceSchema)[];
-  requestBody?: ISwaggerRequestBody | ISwaggerReferenceSchema;
+  requestBody?: ISwaggerReferenceSchema | ISwaggerRequestBody;
   responses: ISwaggerResponses;
   callbacks?: {
     [key: string]: ISwaggerCallback | ISwaggerReferenceSchema;

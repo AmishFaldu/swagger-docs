@@ -4,8 +4,8 @@ import { ISwaggerReferenceSchema } from "./swagger-reference-schema.interface";
 import { ISwaggerSchema } from "./swagger-schema.interface";
 
 export interface ISwaggerMediaType {
-  schema?: ISwaggerSchema | ISwaggerReferenceSchema;
-  example?: any;
+  schema?: ISwaggerReferenceSchema | ISwaggerSchema;
+  example?: unknown;
   examples?: {
     [key: string]: ISwaggerExample | ISwaggerReferenceSchema;
   };

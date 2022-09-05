@@ -9,7 +9,7 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
@@ -19,7 +19,7 @@
     "experimentalDecorators": true,
     "preserveValueImports": false,
     "lib": ["ES2021"],
-    "removeComments": true
+    "removeComments": true,
   },
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }

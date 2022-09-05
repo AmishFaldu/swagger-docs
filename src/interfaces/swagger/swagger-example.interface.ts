@@ -1,6 +1,6 @@
 export interface ISwaggerExample {
   summary?: string;
   description?: string;
-  value?: any;
+  value?: unknown;
   externalValue?: string;
 }

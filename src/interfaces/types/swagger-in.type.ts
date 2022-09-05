@@ -1,2 +1,2 @@
-export type SwaggerParameterInType = "query" | "header" | "path" | "cookie";
-export type SwaggerSecuritySchemeInType = "query" | "header" | "path";
+export type SwaggerParameterInType = "cookie" | "header" | "path" | "query";
+export type SwaggerSecuritySchemeInType = "header" | "path" | "query";

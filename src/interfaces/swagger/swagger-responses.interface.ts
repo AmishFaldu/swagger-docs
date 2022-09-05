@@ -17,6 +17,6 @@ interface ISwaggerResponse {
 }
 
 export interface ISwaggerResponses {
-  default?: ISwaggerResponse | ISwaggerReferenceSchema;
-  [httpStatusCodes: string]: ISwaggerResponse | ISwaggerReferenceSchema;
+  [httpStatusCodes: string]: ISwaggerReferenceSchema | ISwaggerResponse | undefined;
+  default?: ISwaggerReferenceSchema | ISwaggerResponse;
 }

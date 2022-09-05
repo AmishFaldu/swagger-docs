@@ -11,10 +11,10 @@ import { ISwaggerSecurityScheme } from "./swagger-security-scheme.interface";
 
 export interface ISwaggerComponents {
   schemas?: {
-    [schemaname: string]: ISwaggerSchema | ISwaggerReferenceSchema;
+    [schemaname: string]: ISwaggerReferenceSchema | ISwaggerSchema;
   };
   responses?: {
-    [responsename: string]: ISwaggerResponses | ISwaggerReferenceSchema;
+    [responsename: string]: ISwaggerReferenceSchema | ISwaggerResponses;
   };
   parameters?: {
     [paraname: string]: ISwaggerParameter | ISwaggerReferenceSchema;
@@ -23,13 +23,13 @@ export interface ISwaggerComponents {
     [name: string]: ISwaggerExample | ISwaggerReferenceSchema;
   };
   requestBodies?: {
-    [name: string]: ISwaggerRequestBody | ISwaggerReferenceSchema;
+    [name: string]: ISwaggerReferenceSchema | ISwaggerRequestBody;
   };
   headers?: {
     [name: string]: ISwaggerHeader | ISwaggerReferenceSchema;
   };
   securitySchemes?: {
-    [name: string]: ISwaggerSecurityScheme | ISwaggerReferenceSchema;
+    [name: string]: ISwaggerReferenceSchema | ISwaggerSecurityScheme;
   };
   links?: {
     [name: string]: ISwaggerLink | ISwaggerReferenceSchema;

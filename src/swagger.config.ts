@@ -1,4 +1,5 @@
 import {
+  DeepReadonly,
   ISwaggerConfig,
   ISwaggerContact,
   ISwaggerExternalDocs,
@@ -11,6 +12,7 @@ import {
  */
 export class SwaggerConfig {
   private swaggerJSONConfig: ISwaggerConfig;
+
   constructor() {
     this.swaggerJSONConfig = {
       openapi: "3.0.0",
@@ -73,9 +75,10 @@ export class SwaggerConfig {
    * Add contact info to swagger document
    * @param {ISwaggerContact} data - Swagger contact details
    *
-   * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#contactObject
+   * Reference -
+   * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#contactObject
    */
-  public addContactInfo(data: ISwaggerContact): this {
+  public addContactInfo(data: Readonly<ISwaggerContact>): this {
     this.swaggerJSONConfig.info.contact = data;
     return this;
   }
@@ -84,13 +87,15 @@ export class SwaggerConfig {
    * Add license information to swagger document
    * @param {ISwaggerLicense} data - Swagger license information
    *
-   * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#licenseObject
+   * Reference -
+   * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#licenseObject
    */
-  public addLicenseInfo(data: ISwaggerLicense): this {
+  public addLicenseInfo(data: Readonly<ISwaggerLicense>): this {
     this.swaggerJSONConfig.info.license = data;
     return this;
   }
 
+  /* eslint-disable max-len */
   /**
    * Add security schema to swagger document
    * @param {string} securitySchemeName - Name for security schema
@@ -98,47 +103,60 @@ export class SwaggerConfig {
    *
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#componentsSecuritySchemes
    */
+  /* eslint-enable max-len */
   public addSecurity(
     securitySchemeName: string,
-    data: ISwaggerSecurityScheme
+    data: DeepReadonly<ISwaggerSecurityScheme>,
   ): this {
     const securitySchema = { [securitySchemeName]: data };
-    if (!this.swaggerJSONConfig?.components?.securitySchemes) {
+    if (!this.swaggerJSONConfig.components?.securitySchemes) {
       this.swaggerJSONConfig.components = {
         securitySchemes: securitySchema,
       };
-    } else {
-      Object.assign(
-        this.swaggerJSONConfig.components.securitySchemes,
-        securitySchema
-      );
+      return this;
     }
+
+    Object.assign(
+      this.swaggerJSONConfig.components.securitySchemes,
+      securitySchema,
+    );
+
     return this;
   }
 
+  /* eslint-disable max-len */
   /**
    * Add security requirements to swagger open apis
    * @param {string} securitySchemaName - Name of security schema
-   * @param {string[]} requirements - Security requirements. Useful only for oauth security schema type for other security schemas should be empty array
+   * @param {string[]} requirements -Security requirements.
+   * Useful only for oauth security schema type for other security schemas should be empty array
    *
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#securityRequirementObject
    */
+  /* eslint-enable max-len */
   public addSecurityRequirement(
     securitySchemaName: string,
-    requirements: string[]
+    requirements: Readonly<string[]>,
   ): this {
     const securityObject = { [securitySchemaName]: requirements };
+    if (this.swaggerJSONConfig.security === undefined) {
+      this.swaggerJSONConfig.security = [securityObject];
+      return this;
+    }
+
     this.swaggerJSONConfig.security.push(securityObject);
     return this;
   }
 
+  /* eslint-disable max-len */
   /**
    * Add external documentation links to swagger
    * @param {ISwaggerExternalDocs} data - External documents details
-   * 
+   *
    * Reference - https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#externalDocumentationObject
    */
-  public addExternalDocumentation(data: ISwaggerExternalDocs): this {
+  /* eslint-enable max-len */
+  public addExternalDocumentation(data: Readonly<ISwaggerExternalDocs>): this {
     this.swaggerJSONConfig.externalDocs = data;
     return this;
   }

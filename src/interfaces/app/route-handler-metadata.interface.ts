@@ -1,12 +1,5 @@
 export type RouteHandlerMethods =
-  | "GET"
-  | "PUT"
-  | "POST"
-  | "DELETE"
-  | "OPTIONS"
-  | "HEAD"
-  | "PATCH"
-  | "TRACE";
+  "DELETE" | "GET" | "HEAD" | "OPTIONS" | "PATCH" | "POST" | "PUT" | "TRACE";
 
 export interface IRouteHandlerMetadata {
   method: RouteHandlerMethods;

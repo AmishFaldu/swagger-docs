@@ -4,9 +4,9 @@ export interface ISwaggerLink {
   operationRef?: string;
   operationId?: string;
   parameters?: {
-    [key: string]: any;
+    [key: string]: unknown;
   };
-  requestBody?: any;
+  requestBody?: unknown;
   description?: string;
   server?: ISwaggerServer;
 }
