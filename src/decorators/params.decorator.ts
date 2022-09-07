@@ -1,6 +1,6 @@
 import "reflect-metadata";
-import { IPathParamMetadata, IRouteArgMetadata } from "src/interfaces";
 import { DECORATOR_METADATA_ENUM } from "../constants";
+import { IPathParamMetadata, IRouteArgMetadata } from "../interfaces";
 
 /**
  * Common parameter decorator function to attach reflect metadata to route handler arguments
@@ -8,8 +8,12 @@ import { DECORATOR_METADATA_ENUM } from "../constants";
  * @param data - Data associated with parameter
  * @returns Typescript parameter decorator function
  */
-const paramDecorator = (type: string, data: Readonly<IPathParamMetadata> = {}) => {
-  return (target: Readonly<Record<string, unknown>>,
+const paramDecorator = (
+  type: string,
+  data: Readonly<IPathParamMetadata> = {},
+) => {
+  return (
+    target: Readonly<Record<string, unknown>>,
     key: Readonly<string>,
     index: Readonly<number>,
   ): void => {
@@ -42,9 +46,7 @@ const paramDecorator = (type: string, data: Readonly<IPathParamMetadata> = {}) =
  * @param paramname - Parameter nam from route path
  * @returns Parameter decorator function
  */
-export const PathParam = (
-  paramname: string,
-): ParameterDecorator => {
+export const PathParam = (paramname: string): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname,
   };
@@ -56,9 +58,7 @@ export const PathParam = (
  * @param paramname - Query parameter name
  * @returns Parameter decorator
  */
-export const QueryParam = (
-  paramname: string,
-): ParameterDecorator => {
+export const QueryParam = (paramname: string): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname,
   };
@@ -72,7 +72,7 @@ export const QueryParam = (
 export const Body = (): ((
   target: Readonly<Record<string, unknown>>,
   key: string,
-  index: number,
+  index: number
 ) => void) => {
   return paramDecorator(DECORATOR_METADATA_ENUM.BODY);
 };
@@ -84,7 +84,7 @@ export const Body = (): ((
 export const Request = (): ((
   target: Readonly<Record<string, unknown>>,
   key: string,
-  index: number,
+  index: number
 ) => void) => {
   return paramDecorator(DECORATOR_METADATA_ENUM.REQUEST);
 };
@@ -96,7 +96,7 @@ export const Request = (): ((
 export const Response = (): ((
   target: Readonly<Record<string, unknown>>,
   key: string,
-  index: number,
+  index: number
 ) => void) => {
   return paramDecorator(DECORATOR_METADATA_ENUM.RESPONSE);
 };
@@ -108,7 +108,7 @@ export const Response = (): ((
 export const Next = (): ((
   target: Readonly<Record<string, unknown>>,
   key: string,
-  index: number,
+  index: number
 ) => void) => {
   return paramDecorator(DECORATOR_METADATA_ENUM.NEXT);
 };
@@ -118,9 +118,7 @@ export const Next = (): ((
  * @param fieldname - Field name of request in which file object will be present
  * @returns Parameter decorator
  */
-export const File = (
-  fieldname: string,
-): ParameterDecorator => {
+export const File = (fieldname: string): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname: fieldname,
   };
@@ -132,9 +130,7 @@ export const File = (
  * @param fieldname - Field name of request in which files array will be present
  * @returns Parameter decorator
  */
-export const Files = (
-  fieldname: string,
-): ParameterDecorator => {
+export const Files = (fieldname: string): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname: fieldname,
   };
@@ -146,9 +142,7 @@ export const Files = (
  * @param propname - Header property name in request headers object
  * @returns Parameter decorator
  */
-export const Header = (
-  propname: string,
-): ParameterDecorator => {
+export const Header = (propname: string): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname: propname,
   };
