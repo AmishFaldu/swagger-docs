@@ -1,5 +1,5 @@
 import { ClassType } from "../app-config";
-import { DECORATOR_METADATA_ENUM } from "../constants";
+import { DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
 import {
   DeepReadonly,
   IRouteArgMetadata,
@@ -24,14 +24,8 @@ const fetchRouteArgValue = (
   const argType = argDetails.type;
   switch (argType) {
     case DECORATOR_METADATA_ENUM.PATH_PARAM:
-      if (argDetails.data.paramname === undefined) {
-        return null;
-      }
       return req.params[argDetails.data.paramname];
     case DECORATOR_METADATA_ENUM.QUERY_PARAM:
-      if (argDetails.data.paramname === undefined) {
-        return null;
-      }
       return req.query[argDetails.data.paramname];
     case DECORATOR_METADATA_ENUM.BODY:
       return req.body;
@@ -43,14 +37,8 @@ const fetchRouteArgValue = (
       return next;
     case DECORATOR_METADATA_ENUM.FILE:
     case DECORATOR_METADATA_ENUM.FILES:
-      if (argDetails.data.paramname === undefined) {
-        return null;
-      }
       return req[argDetails.data.paramname];
     case DECORATOR_METADATA_ENUM.HEADER:
-      if (argDetails.data.paramname === undefined) {
-        return null;
-      }
       return req.header[argDetails.data.paramname];
     default:
       return null;

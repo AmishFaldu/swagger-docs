@@ -72,7 +72,7 @@ export const expressRoutesMapping: Record<
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
     app.delete(
-      routeData.formattedRoutePath,
+      routeData.fullRoutePath,
       wrappedRouteHandlerFunction(controller, routeData.routeHandler),
     );
   },
@@ -83,7 +83,7 @@ export const expressRoutesMapping: Record<
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
     app.get(
-      routeData.formattedRoutePath,
+      routeData.fullRoutePath,
       wrappedRouteHandlerFunction(controller, routeData.routeHandler),
     );
   },
@@ -94,7 +94,7 @@ export const expressRoutesMapping: Record<
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
     app.head(
-      routeData.formattedRoutePath,
+      routeData.fullRoutePath,
       wrappedRouteHandlerFunction(controller, routeData.routeHandler),
     );
   },
@@ -105,7 +105,7 @@ export const expressRoutesMapping: Record<
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
     app.options(
-      routeData.formattedRoutePath,
+      routeData.fullRoutePath,
       wrappedRouteHandlerFunction(controller, routeData.routeHandler),
     );
   },
@@ -116,7 +116,7 @@ export const expressRoutesMapping: Record<
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
     app.patch(
-      routeData.formattedRoutePath,
+      routeData.fullRoutePath,
       wrappedRouteHandlerFunction(controller, routeData.routeHandler),
     );
   },
@@ -127,7 +127,7 @@ export const expressRoutesMapping: Record<
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
     app.post(
-      routeData.formattedRoutePath,
+      routeData.fullRoutePath,
       wrappedRouteHandlerFunction(controller, routeData.routeHandler),
     );
   },
@@ -138,7 +138,7 @@ export const expressRoutesMapping: Record<
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
     app.put(
-      routeData.formattedRoutePath,
+      routeData.fullRoutePath,
       wrappedRouteHandlerFunction(controller, routeData.routeHandler),
     );
   },
@@ -149,7 +149,7 @@ export const expressRoutesMapping: Record<
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
     app.trace(
-      routeData.formattedRoutePath,
+      routeData.fullRoutePath,
       wrappedRouteHandlerFunction(controller, routeData.routeHandler),
     );
   },

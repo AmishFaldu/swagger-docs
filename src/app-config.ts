@@ -1,12 +1,16 @@
 import { Express } from "express";
 import "reflect-metadata";
-import { DECORATOR_METADATA_ENUM } from "./constants";
+import { DECORATOR_METADATA_ENUM } from "./constants/decorator.constants";
 import {
+  DeepReadonly,
   IBootstrapControllerRoute,
   IControllerMetadata,
   IRouteHandlerMetadata,
+  ISwaggerConfig,
 } from "./interfaces";
 import { expressRoutesMapping } from "./mappings/express-routes.mapping";
+import { swaggerPathsMapping } from "./mappings/swagger-paths.mapping";
+import { deepCopyObject } from "./utils/helper-function.util";
 
 export type ClassType<T = unknown> = new (...args: unknown[]) => T;
 
@@ -14,6 +18,11 @@ export type ClassType<T = unknown> = new (...args: unknown[]) => T;
  * Add controllers to web app
  */
 export class AppConfig {
+  private readonly swaggerConfig: ISwaggerConfig;
+
+  constructor(swaggerConfig: DeepReadonly<Omit<ISwaggerConfig, "paths">>) {
+    this.swaggerConfig = { ...deepCopyObject(swaggerConfig), paths: {} };
+  }
 
   /**
    * Bootstrap controllers to web app̦
@@ -22,7 +31,7 @@ export class AppConfig {
    * @param app - Web app instance
    * @param controllers - List of controller classes
    */
-  public static bootstrapControllersToApp(
+  public bootstrapControllersToApp(
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     app: Express,
     controllers: Readonly<ClassType[]>,
@@ -33,13 +42,41 @@ export class AppConfig {
         Object.getOwnPropertyDescriptors(controller.prototype),
       );
 
-      for (const routeHandlerName of routeHandlersNames) {
+      routeHandlersNames.forEach((routeHandlerName) => {
+        const routeHandlerMetadata: IRouteHandlerMetadata | undefined =
+          Reflect.getMetadata(
+            DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
+            controller.prototype,
+            routeHandlerName,
+          );
+        if (!routeHandlerMetadata) {
+          return;
+        }
+
+        const fullRoutePath = `${controllerRoutePath}${this.formatRoutePath(
+          routeHandlerMetadata.path,
+        )}`;
         this.addRouteToExpressApp(app, controller, {
+          fullRoutePath,
           routeHandlerName,
-          controllerRoutePath,
+          routeMethod: routeHandlerMetadata.method,
         });
-      }
+
+        this.addRouteToSwagger(controller, {
+          fullRoutePath,
+          routeHandlerName,
+          routeMethod: routeHandlerMetadata.method,
+        });
+      });
     }
+  }
+
+  /**
+   * Returns built swagger document
+   */
+  public getSwaggerDocument(): ISwaggerConfig {
+    Object.freeze(this.swaggerConfig);
+    return this.swaggerConfig;
   }
 
   /**
@@ -47,7 +84,7 @@ export class AppConfig {
    * @param routePath - Route path to format
    * @returns Formatted route path string
    */
-  private static formatRoutePath(routePath: string): string {
+  private formatRoutePath(routePath: string): string {
     let formattedRoute = routePath;
     formattedRoute = formattedRoute.startsWith("/")
       ? formattedRoute
@@ -63,7 +100,7 @@ export class AppConfig {
    * @param controller - Controller class
    * @returns Controller's rotue path string
    */
-  private static getControllerRoutePath(controller: ClassType): string {
+  private getControllerRoutePath(controller: ClassType): string {
     const controllerMetadata: IControllerMetadata = Reflect.getMetadata(
       DECORATOR_METADATA_ENUM.CONTROLLER,
       controller,
@@ -75,34 +112,51 @@ export class AppConfig {
    * Add controller methods to web app based on the route decorators assigned to methods
    * @param app - Web app instance
    * @param controller - Controller class
-   * @param routeDetails - Route handler details
+   * @param {IBootstrapControllerRoute} routeDetails - Route handler details
    * @param routeDetails.routeHandlerName - Name of the route handler method in controller class
-   * @param routeDetails.controllerRoutePath - Controller's route path
+   * @param routeDetails.fullRoutePath - Route handler complete path
+   * @param routeDetails.routeMethod - Route handler method
    */
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  private static addRouteToExpressApp(
+  private addRouteToExpressApp(
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     app: Express,
     controller: ClassType,
     routeDetails: Readonly<IBootstrapControllerRoute>,
   ) {
-    const { controllerRoutePath, routeHandlerName } = routeDetails;
-    const routeHandlerMetadata: IRouteHandlerMetadata | undefined =
-      Reflect.getMetadata(
-        DECORATOR_METADATA_ENUM.ROUTE_HANDLER_METADATA,
-        controller.prototype,
-        routeHandlerName,
-      );
-    if (!routeHandlerMetadata) {
-      return;
-    }
-
-    const formattedRoutePath = `${controllerRoutePath}${this.formatRoutePath(
-      routeHandlerMetadata.path,
-    )}`;
-    expressRoutesMapping[routeHandlerMetadata.method](app, controller, {
-      formattedRoutePath,
+    const { fullRoutePath, routeMethod, routeHandlerName } = routeDetails;
+    expressRoutesMapping[routeMethod](app, controller, {
+      fullRoutePath,
       routeHandler: controller.prototype[routeHandlerName],
     });
+  }
+
+  /**
+   * Adds route to swagger configuration
+   * @param controller - Controller class
+   * @param {IBootstrapControllerRoute} routeDetails - Route handler details
+   * @param routeDetails.routeHandlerName - Name of the route handler method in controller class
+   * @param routeDetails.fullRoutePath - Route handler complete path
+   * @param routeDetails.routeMethod - Route handler method
+   */
+  private addRouteToSwagger(
+    controller: ClassType,
+    routeDetails: Readonly<IBootstrapControllerRoute>,
+  ): void {
+    const swaggerPathItemObject = swaggerPathsMapping[routeDetails.routeMethod](
+      controller,
+      routeDetails.routeHandlerName,
+    );
+
+    // Added slash at the end of string to match all the parameters by simple regex pattern
+    // NOTE - We are removing this slash at the end by splicing the string-
+    // so all route urls match proper format
+    const swaggerRoutePath = `${routeDetails.fullRoutePath}/`.replace(
+      /:.+?(?=(\/))/gi,
+      (param) => {
+        return `{${param.slice(1)}}`;
+      },
+    ).slice(0, -1);
+    this.swaggerConfig.paths[swaggerRoutePath] = swaggerPathItemObject;
   }
 }

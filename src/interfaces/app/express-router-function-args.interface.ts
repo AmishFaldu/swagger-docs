@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { RouteHandlerFunctionType } from "../types";
+import { RouteHandlerMethods } from "./route-handler-metadata.interface";
 
 export interface IBootstrapControllerRoute {
+  fullRoutePath: string;
+  routeMethod: RouteHandlerMethods;
   routeHandlerName: string;
-  controllerRoutePath: string;
 }
 
 export interface IRouterHandlerArgs {
@@ -13,6 +15,6 @@ export interface IRouterHandlerArgs {
 }
 
 export interface IExpressRouterMappingRouteData {
-  formattedRoutePath: string;
+  fullRoutePath: string;
   routeHandler: RouteHandlerFunctionType;
 }

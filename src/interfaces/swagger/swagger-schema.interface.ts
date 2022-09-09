@@ -4,7 +4,7 @@ import { ISwaggerReferenceSchema } from "./swagger-reference-schema.interface";
 import { ISwaggerXML } from "./swagger-xml.interface";
 
 type DataTypesSuported =
-  "array" | "boolean" | "integer" | "number" | "objeect" | "string";
+  "array" | "boolean" | "integer" | "number" | "object" | "string";
 
 type DataTypeFormatsSupported =
   "binary" | "byte" | "date-time" | "date" | "double" | "float" | "int32" | "int64" | "password";

@@ -1,23 +1,26 @@
 import "reflect-metadata";
-import { DECORATOR_METADATA_ENUM } from "../constants";
-import { IPathParamMetadata, IRouteArgMetadata } from "../interfaces";
+import { DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
+import {
+  DeepReadonly,
+  IDataRouteArgMetadata,
+  INoDataRouteArgMetadata,
+  IPathParamMetadata,
+  IRouteArgMetadata,
+} from "../interfaces";
 
 /**
  * Common parameter decorator function to attach reflect metadata to route handler arguments
- * @param type - Parameter type
- * @param data - Data associated with parameter
+ * @param {IRouteArgMetadata} paramDetails - Parameter details
+ * @param paramData.type - Parameter type
+ * @param paramData.data - Data associated with parameter
  * @returns Typescript parameter decorator function
  */
-const paramDecorator = (
-  type: string,
-  data: Readonly<IPathParamMetadata> = {},
-) => {
+const paramDecorator = (paramDetails: DeepReadonly<IRouteArgMetadata>) => {
   return (
     target: Readonly<Record<string, unknown>>,
     key: Readonly<string>,
     index: Readonly<number>,
   ): void => {
-    const returnTypes = Reflect.getMetadata("design:paramtypes", target, key);
     const args =
       Reflect.getMetadata(
         DECORATOR_METADATA_ENUM.ROUTE_HANDLER_ARGS,
@@ -25,11 +28,23 @@ const paramDecorator = (
         key,
       ) ?? {};
 
-    const routeArgMetadata: IRouteArgMetadata = {
-      type,
-      data,
-      returntype: returnTypes[index].name,
-    };
+    let routeArgMetadata: IRouteArgMetadata;
+    if (
+      paramDetails.type === DECORATOR_METADATA_ENUM.BODY ||
+      paramDetails.type === DECORATOR_METADATA_ENUM.NEXT ||
+      paramDetails.type === DECORATOR_METADATA_ENUM.REQUEST ||
+      paramDetails.type === DECORATOR_METADATA_ENUM.RESPONSE
+    ) {
+      routeArgMetadata = {
+        type: paramDetails.type,
+      } as INoDataRouteArgMetadata;
+    } else {
+      routeArgMetadata = {
+        type: paramDetails.type,
+        data: (paramDetails as IDataRouteArgMetadata).data,
+      } as IDataRouteArgMetadata;
+    }
+
     Reflect.defineMetadata(
       DECORATOR_METADATA_ENUM.ROUTE_HANDLER_ARGS,
       Object.assign(args, {
@@ -50,7 +65,10 @@ export const PathParam = (paramname: string): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname,
   };
-  return paramDecorator(DECORATOR_METADATA_ENUM.PATH_PARAM, pathParamMetadata);
+  return paramDecorator({
+    type: DECORATOR_METADATA_ENUM.PATH_PARAM,
+    data: pathParamMetadata,
+  });
 };
 
 /**
@@ -59,10 +77,13 @@ export const PathParam = (paramname: string): ParameterDecorator => {
  * @returns Parameter decorator
  */
 export const QueryParam = (paramname: string): ParameterDecorator => {
-  const pathParamMetadata: IPathParamMetadata = {
+  const queryParamMetadata: IPathParamMetadata = {
     paramname,
   };
-  return paramDecorator(DECORATOR_METADATA_ENUM.QUERY_PARAM, pathParamMetadata);
+  return paramDecorator({
+    type: DECORATOR_METADATA_ENUM.QUERY_PARAM,
+    data: queryParamMetadata,
+  });
 };
 
 /**
@@ -74,7 +95,7 @@ export const Body = (): ((
   key: string,
   index: number
 ) => void) => {
-  return paramDecorator(DECORATOR_METADATA_ENUM.BODY);
+  return paramDecorator({ type: DECORATOR_METADATA_ENUM.BODY });
 };
 
 /**
@@ -86,7 +107,7 @@ export const Request = (): ((
   key: string,
   index: number
 ) => void) => {
-  return paramDecorator(DECORATOR_METADATA_ENUM.REQUEST);
+  return paramDecorator({ type: DECORATOR_METADATA_ENUM.REQUEST });
 };
 
 /**
@@ -98,7 +119,7 @@ export const Response = (): ((
   key: string,
   index: number
 ) => void) => {
-  return paramDecorator(DECORATOR_METADATA_ENUM.RESPONSE);
+  return paramDecorator({ type: DECORATOR_METADATA_ENUM.RESPONSE });
 };
 
 /**
@@ -110,7 +131,7 @@ export const Next = (): ((
   key: string,
   index: number
 ) => void) => {
-  return paramDecorator(DECORATOR_METADATA_ENUM.NEXT);
+  return paramDecorator({ type: DECORATOR_METADATA_ENUM.NEXT });
 };
 
 /**
@@ -122,7 +143,10 @@ export const File = (fieldname: string): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname: fieldname,
   };
-  return paramDecorator(DECORATOR_METADATA_ENUM.FILE, pathParamMetadata);
+  return paramDecorator({
+    type: DECORATOR_METADATA_ENUM.FILE,
+    data: pathParamMetadata,
+  });
 };
 
 /**
@@ -134,7 +158,10 @@ export const Files = (fieldname: string): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname: fieldname,
   };
-  return paramDecorator(DECORATOR_METADATA_ENUM.FILES, pathParamMetadata);
+  return paramDecorator({
+    type: DECORATOR_METADATA_ENUM.FILES,
+    data: pathParamMetadata,
+  });
 };
 
 /**
@@ -146,5 +173,8 @@ export const Header = (propname: string): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname: propname,
   };
-  return paramDecorator(DECORATOR_METADATA_ENUM.HEADER, pathParamMetadata);
+  return paramDecorator({
+    type: DECORATOR_METADATA_ENUM.HEADER,
+    data: pathParamMetadata,
+  });
 };

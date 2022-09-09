@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { DECORATOR_METADATA_ENUM } from "../constants";
+import { DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
 import { IRouteHandlerMetadata } from "../interfaces";
 
 /**

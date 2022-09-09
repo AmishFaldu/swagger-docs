@@ -165,7 +165,7 @@ export class SwaggerConfig {
    * Finalize and return swagger document config
    * @returns ISwaggerConfig
    */
-  public finalizeConfig(): ISwaggerConfig {
+  public finalizeConfig(): Omit<ISwaggerConfig, "paths"> {
     Object.freeze(this.swaggerJSONConfig);
     return this.swaggerJSONConfig;
   }
