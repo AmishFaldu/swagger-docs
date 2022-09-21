@@ -18,10 +18,49 @@ export type ClassType<T = unknown> = new (...args: unknown[]) => T;
  * Add controllers to web app
  */
 export class AppConfig {
-  private readonly swaggerConfig: ISwaggerConfig;
+  private swaggerConfig: ISwaggerConfig;
 
   constructor(swaggerConfig: DeepReadonly<Omit<ISwaggerConfig, "paths">>) {
     this.swaggerConfig = { ...deepCopyObject(swaggerConfig), paths: {} };
+
+    // Added default schemas which can be useful for types except class
+    this.swaggerConfig.components.schemas = {
+      ...(this.swaggerConfig.components.schemas ?? {}),
+      Object: {
+        type: "object",
+      },
+      Boolean: {
+        type: "boolean",
+      },
+      Number: {
+        type: "number",
+      },
+      String: {
+        type: "string",
+      },
+      Function: {
+        type: "string",
+        example: "Function",
+      },
+      Undefined: {
+        type: "string",
+        example: "undefined",
+      },
+    };
+  }
+
+  /**
+   * Returns a copy of swagger config
+   */
+  public get swaggerConfigCopy(): ISwaggerConfig {
+    return deepCopyObject(this.swaggerConfig);
+  }
+
+  /**
+   * Sets swagger config copy to original swagger config
+   */
+  public set swaggerConfigCopy(swaggerConfig: DeepReadonly<ISwaggerConfig>) {
+    this.swaggerConfig = deepCopyObject(swaggerConfig);
   }
 
   /**
@@ -143,20 +182,20 @@ export class AppConfig {
     controller: ClassType,
     routeDetails: Readonly<IBootstrapControllerRoute>,
   ): void {
-    const swaggerPathItemObject = swaggerPathsMapping[routeDetails.routeMethod](
-      controller,
-      routeDetails.routeHandlerName,
-    );
+    // binding "this" will be useful when accessing properties of class instance
+    // without wasting parameters of functions
+    const swaggerPathItemObject = swaggerPathsMapping[
+      routeDetails.routeMethod
+    ].bind(this, controller, routeDetails.routeHandlerName)();
 
     // Added slash at the end of string to match all the parameters by simple regex pattern
     // NOTE - We are removing this slash at the end by splicing the string-
     // so all route urls match proper format
-    const swaggerRoutePath = `${routeDetails.fullRoutePath}/`.replace(
-      /:.+?(?=(\/))/gi,
-      (param) => {
+    const swaggerRoutePath = `${routeDetails.fullRoutePath}/`
+      .replace(/:.+?(?=(\/))/gi, (param) => {
         return `{${param.slice(1)}}`;
-      },
-    ).slice(0, -1);
+      })
+      .slice(0, -1);
     this.swaggerConfig.paths[swaggerRoutePath] = swaggerPathItemObject;
   }
 }

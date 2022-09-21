@@ -11,7 +11,7 @@ export interface ISwaggerConfig {
   info: ISwaggerInfo;
   servers?: ISwaggerServer;
   paths: ISwaggerPathsObject;
-  components?: ISwaggerComponents;
+  components: ISwaggerComponents;
   security?: ISwaggerSecurityRequirement[];
   tags?: ISwaggerTag[];
   externalDocs?: ISwaggerExternalDocs;

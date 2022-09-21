@@ -178,7 +178,7 @@
     "wrap-iife": "error",
     "yield-star-spacing": "error",
 
-    // Typescript esline rules
+    // Typescript eslint rules
 
     "@typescript-eslint/consistent-generic-constructors": "warn",
     "@typescript-eslint/consistent-type-assertions": "warn",

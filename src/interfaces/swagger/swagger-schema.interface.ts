@@ -3,7 +3,7 @@ import { ISwaggerExternalDocs } from "./swagger-external-docs.interface";
 import { ISwaggerReferenceSchema } from "./swagger-reference-schema.interface";
 import { ISwaggerXML } from "./swagger-xml.interface";
 
-type DataTypesSuported =
+export type DataTypesSuported =
   "array" | "boolean" | "integer" | "number" | "object" | "string";
 
 type DataTypeFormatsSupported =
@@ -25,7 +25,7 @@ export interface ISwaggerSchema {
   maxProperties?: string;
   minProperties?: string;
   required?: string[] | boolean;
-  enum?: string[];
+  enum?: readonly string[];
   type: DataTypesSuported;
   allOf?: (ISwaggerReferenceSchema | ISwaggerSchema)[];
   oneOf?: (ISwaggerReferenceSchema | ISwaggerSchema)[];

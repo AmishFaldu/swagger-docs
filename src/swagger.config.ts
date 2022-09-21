@@ -109,7 +109,7 @@ export class SwaggerConfig {
     data: DeepReadonly<ISwaggerSecurityScheme>,
   ): this {
     const securitySchema = { [securitySchemeName]: data };
-    if (!this.swaggerJSONConfig.components?.securitySchemes) {
+    if (!this.swaggerJSONConfig.components.securitySchemes) {
       this.swaggerJSONConfig.components = {
         securitySchemes: securitySchema,
       };
