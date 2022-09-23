@@ -21,5 +21,5 @@ export interface ISwaggerOperation {
   };
   deprecated?: boolean;
   security?: ISwaggerSecurityRequirement[];
-  servers?: ISwaggerServer;
+  servers?: ISwaggerServer[];
 }

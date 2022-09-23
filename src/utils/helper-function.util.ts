@@ -7,7 +7,7 @@ import { DeepWritable } from "../interfaces/types/deep-writable.type";
  */
 const objectKeys = (object: Readonly<Record<string, unknown>>): string[] => {
   return Object.keys(object).filter((key) => {
-    return typeof object[key] === typeof {};
+    return typeof object[key] === typeof {} && !Array.isArray(object[key]);
   });
 };
 

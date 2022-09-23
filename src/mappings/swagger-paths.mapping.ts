@@ -2,9 +2,11 @@ import { AppConfig, ClassType } from "../app-config";
 import {
   DECORATOR_METADATA_ENUM,
   DTO_DECORATOR_METADATA_ENUM,
+  ROUTE_DECORATOR_METADATA_ENUM,
 } from "../constants/decorator.constants";
 import {
   DataTypesSuported,
+  DeepReadonly,
   IGetReferenceSchema,
   IRouteArgMetadata,
   ISwaggerOperation,
@@ -12,7 +14,9 @@ import {
   ISwaggerPathItem,
   ISwaggerRequestBody,
   ISwaggerResponses,
+  ISwaggerRouteMetadata,
   ISwaggerSchema,
+  ISwaggerTag,
   RouteHandlerMethods,
 } from "../interfaces";
 
@@ -293,6 +297,32 @@ function generateSwaggerResponses(
 }
 
 /**
+ * Get route handler metadata like tags, security, deprecated, etc
+ * @param controller - Controller class
+ * @param routeHandlerName - Class controller's method name
+ * @returns Swagger route metadata or undefined
+ */
+const getRouteMetadata = (
+  controller: ClassType,
+  routeHandlerName: string,
+): ISwaggerRouteMetadata | undefined => {
+  let routeMetadata: ISwaggerRouteMetadata | undefined =
+    Reflect.getMetadata(
+      ROUTE_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
+      controller,
+    ) ?? {};
+  routeMetadata = {
+    ...routeMetadata,
+    ...(Reflect.getMetadata(
+      ROUTE_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
+      controller.prototype,
+      routeHandlerName,
+    ) ?? {}),
+  };
+  return routeMetadata;
+};
+
+/**
  * Generates swagget path operation object
  * @param this - this keyword referenced to AppConfig class instance
  * @param controller - Controller class
@@ -322,17 +352,33 @@ function generateSwaggerPathOperation(
     routeHandlerName,
   );
 
-  const swaggerPathOperation = {
+  const routeMetadata = getRouteMetadata(controller, routeHandlerName);
+  let swaggerPathOperation: ISwaggerOperation = {
     responses: swaggerApiResponses,
     parameters: swaggerApiParameters,
     requestBody: swaggerApiRequestBody,
-    security: [{}],
-    tags: [],
-    deprecated: false,
-    summary: undefined,
-    description: undefined,
-    externalDocs: { url: "" },
   };
+  if (routeMetadata?.tags) {
+    const swaggerConfigCopy = this.swaggerConfigCopy;
+    const tags = swaggerConfigCopy.tags ?? [];
+
+    const uniqueTags = {};
+    tags.forEach((tag: DeepReadonly<ISwaggerTag>) => {
+      uniqueTags[tag.name] = "tag";
+    });
+    routeMetadata.tags.forEach((tag) => {
+      uniqueTags[tag] = "tag";
+    });
+    Object.keys(uniqueTags).forEach((tag) => {
+      tags.push({ name: tag });
+    });
+
+    this.swaggerConfigCopy = { ...this.swaggerConfigCopy, tags };
+  }
+
+  if (routeMetadata) {
+    swaggerPathOperation = { ...swaggerPathOperation, ...routeMetadata };
+  }
 
   return swaggerPathOperation;
 }

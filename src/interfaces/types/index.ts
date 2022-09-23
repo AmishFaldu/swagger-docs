@@ -1,3 +1,4 @@
+export * from "./decorator-generator.type";
 export * from "./deep-readonly.type";
 export * from "./route-handler-function.type";
 export * from "./swagger-array-item.type";
