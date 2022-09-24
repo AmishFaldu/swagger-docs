@@ -1,6 +1,6 @@
-import { ClassType } from "../app-config";
 import { DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
 import {
+  ClassType,
   DeepReadonly,
   IRouteArgMetadata,
   IRouterHandlerArgs,

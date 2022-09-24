@@ -5,8 +5,8 @@ import {
   RequestHandler,
   Response,
 } from "express";
-import { ClassType } from "../app-config";
 import {
+  ClassType,
   IExpressRouterMappingRouteData,
   RouteHandlerFunctionType,
   RouteHandlerMethods,

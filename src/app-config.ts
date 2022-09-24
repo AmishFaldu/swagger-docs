@@ -2,6 +2,7 @@ import { Express } from "express";
 import "reflect-metadata";
 import { DECORATOR_METADATA_ENUM } from "./constants/decorator.constants";
 import {
+  ClassType,
   DeepReadonly,
   IBootstrapControllerRoute,
   IControllerMetadata,
@@ -11,8 +12,6 @@ import {
 import { expressRoutesMapping } from "./mappings/express-routes.mapping";
 import { swaggerPathsMapping } from "./mappings/swagger-paths.mapping";
 import { deepCopyObject } from "./utils/helper-function.util";
-
-export type ClassType<T = unknown> = new (...args: unknown[]) => T;
 
 /**
  * Add controllers to web app
@@ -28,15 +27,19 @@ export class AppConfig {
       ...(this.swaggerConfig.components.schemas ?? {}),
       Object: {
         type: "object",
+        example: {},
       },
       Boolean: {
         type: "boolean",
+        example: true,
       },
       Number: {
         type: "number",
+        example: 1,
       },
       String: {
         type: "string",
+        example: "string",
       },
       Function: {
         type: "string",

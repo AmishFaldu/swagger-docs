@@ -1,202 +1,92 @@
-import { ROUTE_DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
 import {
-  DecoratorGeneratorType,
-  DeepReadonly,
-  IRouteMetadata,
-  ISwaggerExternalDocs,
-  ISwaggerSecurityRequirement,
-  ISwaggerServer,
-} from "../interfaces";
+  DTO_DECORATOR_METADATA_ENUM,
+  ROUTE_DECORATOR_METADATA_ENUM,
+} from "../constants/decorator.constants";
+import { ClassType, DeepReadonly, IRouteBody } from "../interfaces";
 
 /**
- * Route property decorator wraps class and method decorator for use of decorators
- * at route and controller level
- * @param routeMetadata - Route metadata to be stored
- * @returns Either a class or method decorator,
- * if applied anywhere except class or method throws exception
+ * Common route body decorator for api request and response
+ * @param bodyType - Route body type. To determine if it is request body or response body
+ * @param routeBodyData - Route body data
+ * @returns Typescript property decorator
  */
-const routePropertyDecorator = ({
-  metadataType,
-  value,
-}: DeepReadonly<IRouteMetadata>): DecoratorGeneratorType => {
-  return (...args: Readonly<any[]>) => {
-    switch (args.length) {
-      case 1: {
-        const target = args[0];
-        const routeMetadata: IRouteMetadata =
-          Reflect.getMetadata(
-            ROUTE_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
-            target,
-          ) ?? {};
-
-        routeMetadata[metadataType] = value;
-        Reflect.defineMetadata(
-          ROUTE_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
-          routeMetadata,
-          target,
-        );
-        return;
-      }
-      case 3: {
-        const target = args[0];
-        const property = args[1];
-        if (typeof args[2] === "number") {
-          throw new Error(
-            `Cannot apply ${metadataType} decorator anywhere except controller and methods`,
-          );
-        }
-        const routeMetadata: IRouteMetadata =
-          Reflect.getMetadata(
-            ROUTE_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
-            target,
-            property,
-          ) ?? {};
-
-        routeMetadata[metadataType] = value;
-        Reflect.defineMetadata(
-          ROUTE_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
-          routeMetadata,
+const routeBodyDecorator = (
+  bodyType: ROUTE_DECORATOR_METADATA_ENUM,
+  routeBodyData: DeepReadonly<IRouteBody>,
+): PropertyDecorator => {
+  return (target: ClassType, property: string): void => {
+    Reflect.defineMetadata(bodyType, routeBodyData, target, property);
+    if (typeof routeBodyData.type === typeof class {}) {
+      const dependencies =
+        (Reflect.getMetadata(
+          DTO_DECORATOR_METADATA_ENUM.DTO_SCHEMA_DEPENDENCY,
           target,
           property,
-        );
-        return;
-      }
-      case 2:
-      default:
-        throw new Error(
-          `Cannot apply ${metadataType} decorator anywhere except controller and methods`,
-        );
+        ) as unknown[] | undefined) ?? [];
+      dependencies.push(routeBodyData.type);
+      Reflect.defineMetadata(
+        DTO_DECORATOR_METADATA_ENUM.DTO_SCHEMA_DEPENDENCY,
+        dependencies,
+        target,
+        property,
+      );
     }
   };
 };
 
 /**
- * Add tags to route or controller
- * @param tags - Array of string specifying tags associated with route
- * @returns Typescript decorator function
+ * Specify route's response body.
+ * It could be enum or dto class or literal types.
+ * @param type - Type of response body
+ * @param options - Options for response body
+ * @returns Typescript property decorator
  */
-export const RouteTag = (
-  ...tags: Readonly<string[]>
-): DecoratorGeneratorType => {
-  return routePropertyDecorator({ metadataType: "tags", value: tags });
+export const RouteResponseBody = (
+  type: IRouteBody["type"],
+  options: Readonly<IRouteBody["options"]> = {},
+): PropertyDecorator => {
+  const response: IRouteBody = {
+    type,
+    options,
+  };
+  return routeBodyDecorator(
+    ROUTE_DECORATOR_METADATA_ENUM.RESPONSE_BODY,
+    response,
+  );
 };
 
 /**
- * Add summary to route or controller
- * @param summary - Short summary for routes
- * @returns Typescript decorator function
+ * Sepcify route's request body.
+ * It could be enum or dto class or literal types.
+ * @param type - Type of request body
+ * @param options - Options for request body
+ * @returns Typescript property decorator
  */
-export const RouteSummary = (summary: string): DecoratorGeneratorType => {
-  return routePropertyDecorator({ metadataType: "summary", value: summary });
+export const RouteRequestBody = (
+  type: IRouteBody["type"],
+  options: Readonly<IRouteBody["options"]> = {},
+): PropertyDecorator => {
+  const request: IRouteBody = {
+    type,
+    options,
+  };
+  return routeBodyDecorator(
+    ROUTE_DECORATOR_METADATA_ENUM.REQUEST_BODY,
+    request,
+  );
 };
 
-/**
- * Add description to route or controller
- * @param description - Description for routes
- * @returns Typescript decorator function
- */
-export const RouteDescription = (
-  description: string,
-): DecoratorGeneratorType => {
-  return routePropertyDecorator({
-    metadataType: "description",
-    value: description,
-  });
-};
-
-/**
- * Add external docs to route or controller
- * @param externalDocs - External docs details
- * @returns Typescript decorator function
- */
-export const RouteExternalDocs = (
-  externalDocs: Readonly<ISwaggerExternalDocs>,
-): DecoratorGeneratorType => {
-  return routePropertyDecorator({
-    metadataType: "externalDocs",
-    value: externalDocs,
-  });
-};
-
-/**
- * Make route or controller apis deprecated
- * @param routeDeprecated - Boolean indicating route or controller is deprecated or not
- * @returns Typescript decorator function
- */
-export const RouteDeprecated = (
-  routeDeprecated = true,
-): DecoratorGeneratorType => {
-  return routePropertyDecorator({
-    metadataType: "deprecated",
-    value: routeDeprecated,
-  });
-};
-
-/**
- * Add security to route or controller
- * @param security - Security details
- * @returns Typescript decorator function
- */
-export const RouteSecurity = (
-  security: DeepReadonly<ISwaggerSecurityRequirement[]>,
-): DecoratorGeneratorType => {
-  return routePropertyDecorator({ metadataType: "security", value: security });
-};
-
-/**
- * Add external servers to route and controller
- * @param server - Server details
- * @returns Typescript decorator function
- */
-export const RouteServers = (
-  server: DeepReadonly<ISwaggerServer[]>,
-): DecoratorGeneratorType => {
-  return routePropertyDecorator({ metadataType: "servers", value: server });
-};
-
-// export function RouteResponseBody(
-//   type: IRouteBody["type"],
-//   options?: Readonly<IRouteBody["options"]>
-// ): PropertyDecorator;
-// export function RouteResponseBody(
-//   type: any,
-//   options?: Readonly<IRouteBody["options"]>
-// ): PropertyDecorator;
-
-// // eslint-disable-next-line func-style
-// export function RouteResponseBody(
-//   type: any,
-//   options: Readonly<IRouteBody["options"]> = {},
-// ): PropertyDecorator {
-//   const response: IRouteBody = {
-//     type,
-//     options,
-//   };
-//   return routePropertyDecorator({
-//     metadataType: ROUTE_DECORATOR_METADATA_ENUM.RESPONSE_BODY,
-//     value: response,
+// /**
+//  * Adds middleware function to route and controller
+//  * @param middlewareFunctions - Middleware function
+//  * @returns
+//  */
+// export const RouteMiddleware = (
+//   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+//   ...middlewareFunctions: RequestHandler[]
+// ): DecoratorGeneratorType => {
+//   return swaggerMetadataDecorator({
+//     metadataType: "middleware",
+//     value: middlewareFunctions,
 //   });
-// }
-
-// export const RouteRequestBody = (
-//   type: IRouteBody["type"],
-//   options: Readonly<IRouteBody["options"]> = {},
-// ): PropertyDecorator => {
-//   const request: IRouteBody = {
-//     type,
-//     options,
-//   };
-//   return routePropertyDecorator(
-//     ROUTE_DECORATOR_METADATA_ENUM.REQUEST_BODY,
-//     request,
-//   );
-// };
-
-// export const Middleware = (
-//   middleware: DeepReadonly<RequestHandler>,
-// ): PropertyDecorator => {
-//   return routePropertyDecorator(
-//     ROUTE_DECORATOR_METADATA_ENUM.MIDDLEWARE,
-//     middleware,
-//   );
 // };

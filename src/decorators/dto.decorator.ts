@@ -1,7 +1,7 @@
 import "reflect-metadata";
-import { ClassType } from "../app-config";
 import { DTO_DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
 import {
+  ClassType,
   DeepReadonly,
   DtoPropertyArgs,
   IArrayDecoratorArgs,
@@ -35,7 +35,7 @@ const getItemName = (itemType: SwaggerArrayItemType): string => {
 const addDtoDependencyToMetadata = (
   target: ClassType,
   { type, options }: DeepReadonly<DtoPropertyArgs>,
-  objectType: any,
+  objectType: unknown,
 ): void => {
   if (
     (type === "array" && typeof options.itemType === "function") ||
@@ -101,24 +101,30 @@ const addPropertyToSwaggerSchema = ({
             $ref: `#/components/schemas/${getItemName(options.itemType)}`,
           }
           : undefined,
-      maxLength: type === "string"
-        ? `${options.maxLength}`
-        : undefined,
-      minLength: type === "string"
-        ? `${options.minLength}`
-        : undefined,
-      minItems: type === "array"
-        ? `${options.minItems}`
-        : undefined,
-      maxItems: type === "array"
-        ? `${options.maxItems}`
-        : undefined,
-      maximum: type === "number"
-        ? `${options.maximum}`
-        : undefined,
-      minimum: type === "number"
-        ? `${options.minimum}`
-        : undefined,
+      maxLength:
+        type === "string" && options.maxLength !== undefined
+          ? `${options.maxLength}`
+          : undefined,
+      minLength:
+        type === "string" && options.minLength !== undefined
+          ? `${options.minLength}`
+          : undefined,
+      minItems:
+        type === "array" && options.minItems !== undefined
+          ? `${options.minItems}`
+          : undefined,
+      maxItems:
+        type === "array" && options.maxItems !== undefined
+          ? `${options.maxItems}`
+          : undefined,
+      maximum:
+        type === "number" && options.maximum !== undefined
+          ? `${options.maximum}`
+          : undefined,
+      minimum:
+        type === "number" && options.minimum !== undefined
+          ? `${options.minimum}`
+          : undefined,
       required: options.required,
     };
     Reflect.defineMetadata(
@@ -127,7 +133,11 @@ const addPropertyToSwaggerSchema = ({
       target,
     );
 
-    addDtoDependencyToMetadata(target, { type, options } as DtoPropertyArgs, objectType);
+    addDtoDependencyToMetadata(
+      target,
+      { type, options } as DtoPropertyArgs,
+      objectType,
+    );
   };
 };
 

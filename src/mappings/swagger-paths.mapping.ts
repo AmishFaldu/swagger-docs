@@ -1,17 +1,20 @@
-import { AppConfig, ClassType } from "../app-config";
+import { AppConfig } from "../app-config";
 import {
   DECORATOR_METADATA_ENUM,
   DTO_DECORATOR_METADATA_ENUM,
   ROUTE_DECORATOR_METADATA_ENUM,
+  SWAGGER_METADATA_DECORATOR_METADATA_ENUM,
 } from "../constants/decorator.constants";
 import {
-  DataTypesSuported,
+  ClassType,
   DeepReadonly,
-  IGetReferenceSchema,
+  EnumForType,
   IRouteArgMetadata,
+  IRouteBody,
   ISwaggerOperation,
   ISwaggerParameter,
   ISwaggerPathItem,
+  ISwaggerReferenceSchema,
   ISwaggerRequestBody,
   ISwaggerResponses,
   ISwaggerRouteMetadata,
@@ -143,33 +146,28 @@ function getReferenceSchema(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   this: AppConfig,
   type: any,
-): IGetReferenceSchema {
-  let schemaType: DataTypesSuported | undefined = undefined;
-  let referenceSchema: string | undefined = undefined;
+): ISwaggerReferenceSchema | ISwaggerSchema {
+  let schema: ISwaggerReferenceSchema | ISwaggerSchema | undefined = undefined;
   const clonedSwaggerConfig = this.swaggerConfigCopy;
 
-  if (type.name === "Object") {
-    schemaType = "object";
-    referenceSchema = "#/components/schemas/Object";
-  } else if (type.name === "Boolean") {
-    schemaType = "boolean";
-    referenceSchema = "#/components/schemas/Boolean";
-  } else if (type.name === "Number") {
-    schemaType = "number";
-    referenceSchema = "#/components/schemas/Number";
-  } else if (type.name === "String") {
-    schemaType = "string";
-    referenceSchema = "#/components/schemas/String";
-  } else if (type.name === "Function") {
-    schemaType = "string";
-    referenceSchema = "#/components/schemas/Function";
+  if (
+    type.name === "Object" ||
+    type.name === "Boolean" ||
+    type.name === "Number" ||
+    type.name === "String" ||
+    type.name === "Function"
+  ) {
+    schema = {
+      $ref: `#/components/schemas/${type.name}`,
+    };
   } else if (type.name === "undefined") {
-    schemaType = "string";
-    referenceSchema = "#/components/schemas/Undefined";
+    schema = {
+      $ref: "#/components/schemas/Undefined",
+    };
   }
 
-  if (schemaType !== undefined && referenceSchema !== undefined) {
-    return { schemaType, referenceSchema };
+  if (schema !== undefined) {
+    return schema;
   }
 
   const dtoSchema: ISwaggerSchema = Reflect.getMetadata(
@@ -177,8 +175,10 @@ function getReferenceSchema(
     type.prototype,
   ) ?? { type: "object" };
   const dtoClassName = type.name;
-  schemaType = "object";
-  referenceSchema = `#/components/schemas/${dtoClassName}`;
+
+  schema = {
+    $ref: `#/components/schemas/${dtoClassName}`,
+  };
 
   clonedSwaggerConfig.components.schemas = {
     ...(clonedSwaggerConfig.components.schemas ?? {}),
@@ -187,8 +187,110 @@ function getReferenceSchema(
   this.swaggerConfigCopy = clonedSwaggerConfig;
 
   processDependenciesOfSchema.call(this, type);
+  return schema;
+}
+/* eslint-enable no-invalid-this */
 
-  return { schemaType, referenceSchema };
+/**
+ * Process specified route's request or response body
+ * @param this - this keyword referenced to AppConfig class instance
+ * @param bodyType - Route body type. To determine if it is request or response body
+ * @param routeHandlerDetails - Route handler details
+ * @returns Either swagger schema or undefined if no route body is specified explicitly
+ */
+/* eslint-disable no-invalid-this */
+// eslint-disable-next-line func-style
+function processRouteBody(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  this: AppConfig,
+  bodyType: ROUTE_DECORATOR_METADATA_ENUM,
+  routeHandlerDetails: Readonly<{
+    controller: ClassType;
+    routeHandlerName: string;
+  }>,
+): ISwaggerReferenceSchema | ISwaggerSchema | undefined {
+  const routeBodyMetadata: IRouteBody | undefined = Reflect.getMetadata(
+    bodyType,
+    routeHandlerDetails.controller.prototype,
+    routeHandlerDetails.routeHandlerName,
+  );
+  if (routeBodyMetadata === undefined) {
+    return undefined;
+  }
+
+  let swaggerSchema: ISwaggerReferenceSchema | ISwaggerSchema | undefined;
+  if (typeof routeBodyMetadata.type === typeof EnumForType) {
+    swaggerSchema = {
+      type: "string",
+      deprecated: routeBodyMetadata.options.deprecated,
+      nullable: routeBodyMetadata.options.nullable,
+      required: routeBodyMetadata.options.required,
+    };
+
+    if (routeBodyMetadata.options.isArray === true) {
+      swaggerSchema.type = "array";
+      swaggerSchema.items = {
+        type: "string",
+        enum: Object.values(routeBodyMetadata.type),
+      };
+    } else {
+      swaggerSchema.enum = Object.values(routeBodyMetadata.type);
+    }
+  } else if (
+    routeBodyMetadata.type === "Boolean" ||
+    routeBodyMetadata.type === "Number" ||
+    routeBodyMetadata.type === "Object" ||
+    routeBodyMetadata.type === "String" ||
+    routeBodyMetadata.type === "Undefined"
+  ) {
+    swaggerSchema = {
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      $ref: `#/components/schemas/${routeBodyMetadata.type}`,
+      deprecated: routeBodyMetadata.options.deprecated,
+      nullable: routeBodyMetadata.options.nullable,
+      required: routeBodyMetadata.options.required,
+    };
+
+    if (routeBodyMetadata.options.isArray === true) {
+      swaggerSchema = {
+        type: "array",
+        items: {
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
+          $ref: `#/components/schemas/${routeBodyMetadata.type}`,
+        },
+        deprecated: routeBodyMetadata.options.deprecated,
+        nullable: routeBodyMetadata.options.nullable,
+        required: routeBodyMetadata.options.required,
+      };
+    }
+  } else if (typeof routeBodyMetadata.type === typeof class {}) {
+    swaggerSchema = {
+      $ref: `#/components/schemas/${
+        (routeBodyMetadata.type as ClassType).name
+      }`,
+      deprecated: routeBodyMetadata.options.deprecated,
+      nullable: routeBodyMetadata.options.nullable,
+      required: routeBodyMetadata.options.required,
+    };
+    if (routeBodyMetadata.options.isArray === true) {
+      swaggerSchema = {
+        type: "array",
+        deprecated: routeBodyMetadata.options.deprecated,
+        nullable: routeBodyMetadata.options.nullable,
+        required: routeBodyMetadata.options.required,
+        items: {
+          $ref: `#/components/schemas/${
+            (routeBodyMetadata.type as ClassType).name
+          }`,
+        },
+      };
+    }
+    getReferenceSchema.call(this, routeBodyMetadata.type);
+  } else {
+    swaggerSchema = undefined;
+  }
+
+  return swaggerSchema;
 }
 /* eslint-enable no-invalid-this */
 
@@ -199,6 +301,7 @@ function getReferenceSchema(
  * @param routeHandlerName - Controller class's method name
  * @returns object containing swagger request body
  */
+/* eslint-disable no-invalid-this */
 // eslint-disable-next-line func-style
 function generateSwaggerRequestBody(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -226,25 +329,29 @@ function generateSwaggerRequestBody(
     return undefined;
   }
 
-  const returnTypes = Reflect.getMetadata(
-    "design:paramtypes",
-    controller.prototype,
-    routeHandlerName,
-  );
-  const bodyReturnType = returnTypes[parseInt(bodyArgIndex, 10)];
-
-  const { schemaType, referenceSchema } = getReferenceSchema.call(
-    // eslint-disable-next-line no-invalid-this
+  let schema: ISwaggerReferenceSchema | ISwaggerSchema | undefined;
+  schema = processRouteBody.call(
     this,
-    bodyReturnType,
-  ) as IGetReferenceSchema;
+    ROUTE_DECORATOR_METADATA_ENUM.REQUEST_BODY,
+    {
+      controller,
+      routeHandlerName,
+    },
+  );
+
+  if (schema === undefined) {
+    const returnTypes = Reflect.getMetadata(
+      "design:paramtypes",
+      controller.prototype,
+      routeHandlerName,
+    );
+    const bodyReturnType = returnTypes[parseInt(bodyArgIndex, 10)];
+    schema = getReferenceSchema.call(this, bodyReturnType);
+  }
   const swaggerRequestBody: ISwaggerRequestBody = {
     content: {
       "application/json": {
-        schema: {
-          type: schemaType,
-          $ref: referenceSchema,
-        },
+        schema,
         // examples: {},
       },
     },
@@ -253,6 +360,7 @@ function generateSwaggerRequestBody(
   };
   return swaggerRequestBody;
 }
+/* eslint-enable no-invalid-this */
 
 /**
  * Generate swagger api response body
@@ -260,6 +368,7 @@ function generateSwaggerRequestBody(
  * @param routeHandlerName - Controller class's method name
  * @returns object containing swagger response
  */
+/* eslint-disable no-invalid-this */
 // eslint-disable-next-line func-style
 function generateSwaggerResponses(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -267,26 +376,30 @@ function generateSwaggerResponses(
   controller: ClassType,
   routeHandlerName: string,
 ): ISwaggerResponses {
-  const returnType = Reflect.getMetadata(
-    "design:returntype",
-    controller.prototype,
-    routeHandlerName,
+  let schema: ISwaggerReferenceSchema | ISwaggerSchema | undefined;
+  schema = processRouteBody.call(
+    this,
+    ROUTE_DECORATOR_METADATA_ENUM.RESPONSE_BODY,
+    {
+      controller,
+      routeHandlerName,
+    },
   );
 
-  const { schemaType, referenceSchema } = getReferenceSchema.call(
-    // eslint-disable-next-line no-invalid-this
-    this,
-    returnType,
-  ) as IGetReferenceSchema;
+  if (schema === undefined) {
+    const returnType = Reflect.getMetadata(
+      "design:returntype",
+      controller.prototype,
+      routeHandlerName,
+    );
+    schema = getReferenceSchema.call(this, returnType);
+  }
   const swaggerApiResponses: ISwaggerResponses = {
     "200": {
       description: "Success",
       content: {
         "application/json": {
-          schema: {
-            type: schemaType,
-            $ref: referenceSchema,
-          },
+          schema,
           // examples: {},
         },
       },
@@ -295,6 +408,7 @@ function generateSwaggerResponses(
 
   return swaggerApiResponses;
 }
+/* eslint-enable no-invalid-this */
 
 /**
  * Get route handler metadata like tags, security, deprecated, etc
@@ -308,13 +422,13 @@ const getRouteMetadata = (
 ): ISwaggerRouteMetadata | undefined => {
   let routeMetadata: ISwaggerRouteMetadata | undefined =
     Reflect.getMetadata(
-      ROUTE_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
+      SWAGGER_METADATA_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
       controller,
     ) ?? {};
   routeMetadata = {
     ...routeMetadata,
     ...(Reflect.getMetadata(
-      ROUTE_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
+      SWAGGER_METADATA_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
       controller.prototype,
       routeHandlerName,
     ) ?? {}),

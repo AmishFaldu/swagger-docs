@@ -1,3 +1,4 @@
+import { SWAGGER_METADATA_DECORATOR_METADATA_ENUM } from "../../constants/decorator.constants";
 import {
   ISwaggerExternalDocs,
   ISwaggerSecurityRequirement,
@@ -6,37 +7,37 @@ import {
 import { DeepReadonly } from "../types";
 
 export interface ISwaggerRouteTagsMetadata {
-  metadataType: "tags";
+  metadataType: SWAGGER_METADATA_DECORATOR_METADATA_ENUM.TAG;
   value: string[];
 }
 
 export interface ISwaggerRouteDeprecatedMetadata {
-  metadataType: "deprecated";
+  metadataType: SWAGGER_METADATA_DECORATOR_METADATA_ENUM.DEPRECATED;
   value: boolean;
 }
 
 export interface ISwaggerRouteSummaryMetadata {
-  metadataType: "summary";
+  metadataType: SWAGGER_METADATA_DECORATOR_METADATA_ENUM.SUMMARY;
   value: string;
 }
 
 export interface ISwaggerRouteDescriptionMetadata {
-  metadataType: "description";
+  metadataType: SWAGGER_METADATA_DECORATOR_METADATA_ENUM.DESCRIPTION;
   value: string;
 }
 
 export interface ISwaggerRouteExternalDocssMetadata {
-  metadataType: "externalDocs";
+  metadataType: SWAGGER_METADATA_DECORATOR_METADATA_ENUM.EXTERNAL_DOCS;
   value: ISwaggerExternalDocs;
 }
 
 export interface ISwaggerRouteServersMetadata {
-  metadataType: "servers";
+  metadataType: SWAGGER_METADATA_DECORATOR_METADATA_ENUM.SERVERS;
   value: ISwaggerServer[];
 }
 
 export interface ISwaggerRouteSecurityMetadata {
-  metadataType: "security";
+  metadataType: SWAGGER_METADATA_DECORATOR_METADATA_ENUM.SECURITY;
   value: DeepReadonly<ISwaggerSecurityRequirement[]>;
 }
 

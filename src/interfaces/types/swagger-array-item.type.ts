@@ -1,4 +1,4 @@
-import { ClassType } from "../../app-config";
+import { ClassType } from "./class.type";
 
 export type SwaggerArrayItemType =
   | ClassType

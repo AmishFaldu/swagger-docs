@@ -3,19 +3,21 @@ export const enum DTO_DECORATOR_METADATA_ENUM {
   DTO_SCHEMA_DEPENDENCY = "__swagger_docs.dto_decorator.dto_schema_dependency__",
 }
 
-export const enum ROUTE_DECORATOR_METADATA_ENUM {
-  TAG = "__swagger_docs.route_decorator.tag__",
-  SUMMARY = "__swagger_docs.route_decorator.summary__",
-  DESCRIPTION = "__swagger_docs.route_decorator.description__",
-  EXTERNAL_DOCS = "__swagger_docs.route_decorator.external_docs__",
-  DEPRECATED = "__swagger_docs.route_decorator.deprecated__",
-  SECURITY = "__swagger_docs.route_decorator.security__",
-  SERVERS = "__swagger_docs.route_decorator.servers__",
-  RESPONSE_BODY = "__swagger_docs.route_decorator.response__",
-  REQUEST_BODY = "__swagger_docs.route_decorator.request_body__",
+export const enum SWAGGER_METADATA_DECORATOR_METADATA_ENUM {
+  TAG = "__swagger_docs.swagger_metadata_decorator.tag__",
+  SUMMARY = "__swagger_docs.swagger_metadata_decorator.summary__",
+  DESCRIPTION = "__swagger_docs.swagger_metadata_decorator.description__",
+  EXTERNAL_DOCS = "__swagger_docs.swagger_metadata_decorator.external_docs__",
+  DEPRECATED = "__swagger_docs.swagger_metadata_decorator.deprecated__",
+  SECURITY = "__swagger_docs.swagger_metadata_decorator.security__",
+  SERVERS = "__swagger_docs.swagger_metadata_decorator.servers__",
+  MIDDLEWARE = "__swagger_docs.swagger_metadata_decorator.middleware__",
+  ROUTE_METADATA = "__swagger_docs.swagger_metadata_decorator.route_metadata__",
+}
 
-  ROUTE_METADATA = "__swagger_docs.route_decorator.route_metadata__",
-  MIDDLEWARE = "__swagger_docs.route_decorator.middleware__",
+export const enum ROUTE_DECORATOR_METADATA_ENUM {
+  RESPONSE_BODY = "__swagger_docs.route_decorator.response_body__",
+  REQUEST_BODY = "__swagger_docs.route_decorator.request_body__",
 }
 
 export const enum DECORATOR_METADATA_ENUM {
