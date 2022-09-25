@@ -9,9 +9,11 @@
   },
   "keywords": [
     "swagger",
-    "docs",
+    "api docs",
     "swagger api docs",
-    "open api"
+    "open api",
+    "express swagger",
+    "openapi"
   ],
   "author": "Amish Faldu (amish.faldu@gmail.com)",
   "license": "ISC",
