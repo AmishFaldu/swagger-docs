@@ -12,6 +12,6 @@ export interface ISwaggerSecurityScheme {
   in: SwaggerSecuritySchemeInType;
   scheme: SwaggerSecurityHttpAuthSchemesType;
   bearerFormat?: string;
-  flows: ISwaggerOauthFlows;
-  openIdCOnnectUrl: string;
+  flows?: ISwaggerOauthFlows;
+  openIdConnectUrl?: string;
 }

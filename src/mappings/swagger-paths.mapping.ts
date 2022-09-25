@@ -23,6 +23,7 @@ import {
   getReferenceSchema,
   processRouteBody,
 } from "../utils/route-handler.util";
+import { swaggerMetadataMapping } from "./swagger-metadata.mapping";
 
 /**
  * Generate different request parameters for swagger apis
@@ -206,7 +207,7 @@ const getRouteMetadata = (
   controller: ClassType,
   routeHandlerName: string,
 ): ISwaggerRouteMetadata | undefined => {
-  let routeMetadata: ISwaggerRouteMetadata | undefined =
+  let routeMetadata: ISwaggerRouteMetadata | Record<string, unknown> =
     Reflect.getMetadata(
       SWAGGER_METADATA_DECORATOR_METADATA_ENUM.ROUTE_METADATA,
       controller,
@@ -219,7 +220,16 @@ const getRouteMetadata = (
       routeHandlerName,
     ) ?? {}),
   };
-  return routeMetadata;
+
+  if (Object.keys(routeMetadata).length <= 0) {
+    return undefined;
+  }
+  const processedSwaggerRouteMetadata = {};
+  Object.keys(routeMetadata).forEach((key) => {
+    processedSwaggerRouteMetadata[swaggerMetadataMapping[key]] =
+      routeMetadata[key];
+  });
+  return processedSwaggerRouteMetadata;
 };
 
 /**
@@ -258,7 +268,11 @@ function generateSwaggerPathOperation(
     parameters: swaggerApiParameters,
     requestBody: swaggerApiRequestBody,
   };
-  if (routeMetadata?.tags) {
+  if (!routeMetadata) {
+    return swaggerPathOperation;
+  }
+
+  if (routeMetadata.tags) {
     const swaggerConfigCopy = this.swaggerConfigCopy;
     const tags = swaggerConfigCopy.tags ?? [];
 
@@ -276,10 +290,7 @@ function generateSwaggerPathOperation(
     this.swaggerConfigCopy = { ...this.swaggerConfigCopy, tags };
   }
 
-  if (routeMetadata) {
-    swaggerPathOperation = { ...swaggerPathOperation, ...routeMetadata };
-  }
-
+  swaggerPathOperation = { ...swaggerPathOperation, ...routeMetadata };
   return swaggerPathOperation;
 }
 /* eslint-enable no-invalid-this */

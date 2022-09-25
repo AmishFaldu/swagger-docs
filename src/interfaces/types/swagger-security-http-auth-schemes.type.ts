@@ -1,5 +1,5 @@
 export type SwaggerSecurityHttpAuthSchemesType =
-  | "Baisc"
+  | "Basic"
   | "Bearer"
   | "Digest"
   | "HOBA"
