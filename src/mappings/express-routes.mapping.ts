@@ -5,23 +5,67 @@ import {
   RequestHandler,
   Response,
 } from "express";
+import { ROUTE_DECORATOR_METADATA_ENUM } from "src/constants/decorator.constants";
 import {
   ClassType,
+  DeepReadonly,
   IExpressRouterMappingRouteData,
+  IRouteMiddleware,
   RouteHandlerFunctionType,
   RouteHandlerMethods,
 } from "../interfaces";
 import { generateRouteHandlerArgs } from "../utils/route-handler.util";
 
 /**
+ * Fetches and returns middlewares from reflect metadata
+ * @param controller - Controller class
+ * @param routeHandler - Route handler method in controller class
+ * @returns Route middlewares
+ */
+const getMiddlewaresForRoute = (
+  controller: ClassType,
+  routeHandler: RouteHandlerFunctionType,
+): {
+  beforeMiddlewares: RequestHandler[];
+  afterMiddlewares: RequestHandler[];
+} => {
+  const beforeMiddlewares: RequestHandler[] = [];
+  const afterMiddlewares: RequestHandler[] = [];
+  const routeMiddlewaresMetadata: IRouteMiddleware[] | undefined =
+    Reflect.getMetadata(ROUTE_DECORATOR_METADATA_ENUM.MIDDLEWARE, controller) ??
+    Reflect.getMetadata(
+      ROUTE_DECORATOR_METADATA_ENUM.MIDDLEWARE,
+      controller.prototype,
+      routeHandler.name,
+    );
+
+  if (routeMiddlewaresMetadata !== undefined) {
+    routeMiddlewaresMetadata.forEach(
+      (middleware: DeepReadonly<IRouteMiddleware>) => {
+        if (middleware.options.after === true) {
+          afterMiddlewares.unshift(...middleware.middlewareFunctions);
+        }
+        if (middleware.options.before === true) {
+          beforeMiddlewares.unshift(...middleware.middlewareFunctions);
+        }
+      },
+    );
+  }
+  return { afterMiddlewares, beforeMiddlewares };
+};
+
+/**
  * Wrapper around route handler functions to better handler response and exceptions
  * @param controller - Controller class
  * @param routeHandler - Route handler function defined in controller class
+ * @param hasAfterMiddlewares - Boolean indicating whether this route handler
+ * will execute middlewares function after executing itself
  * @returns A wrapped request handler function
  */
 const wrappedRouteHandlerFunction = (
   controller: ClassType,
   routeHandler: RouteHandlerFunctionType,
+  hasAfterMiddlewares: boolean,
 ): RequestHandler => {
   return async (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -41,6 +85,12 @@ const wrappedRouteHandlerFunction = (
         },
       );
       const response = await routeHandler(...routeHandlerArgs);
+      if (hasAfterMiddlewares) {
+        // eslint-disable-next-line require-atomic-updates
+        res.locals.data = response;
+        next();
+        return;
+      }
       if (!res.headersSent) {
         res.status(200).send(response);
         return;
@@ -71,9 +121,19 @@ export const expressRoutesMapping: Record<
     controller: ClassType,
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
+    const { afterMiddlewares, beforeMiddlewares } = getMiddlewaresForRoute(
+      controller,
+      routeData.routeHandler,
+    );
     app.delete(
       routeData.fullRoutePath,
-      wrappedRouteHandlerFunction(controller, routeData.routeHandler),
+      beforeMiddlewares,
+      wrappedRouteHandlerFunction(
+        controller,
+        routeData.routeHandler,
+        afterMiddlewares.length > 0,
+      ),
+      afterMiddlewares,
     );
   },
   GET: (
@@ -82,9 +142,19 @@ export const expressRoutesMapping: Record<
     controller: ClassType,
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
+    const { afterMiddlewares, beforeMiddlewares } = getMiddlewaresForRoute(
+      controller,
+      routeData.routeHandler,
+    );
     app.get(
       routeData.fullRoutePath,
-      wrappedRouteHandlerFunction(controller, routeData.routeHandler),
+      beforeMiddlewares,
+      wrappedRouteHandlerFunction(
+        controller,
+        routeData.routeHandler,
+        afterMiddlewares.length > 0,
+      ),
+      afterMiddlewares,
     );
   },
   HEAD: (
@@ -93,9 +163,19 @@ export const expressRoutesMapping: Record<
     controller: ClassType,
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
+    const { afterMiddlewares, beforeMiddlewares } = getMiddlewaresForRoute(
+      controller,
+      routeData.routeHandler,
+    );
     app.head(
       routeData.fullRoutePath,
-      wrappedRouteHandlerFunction(controller, routeData.routeHandler),
+      beforeMiddlewares,
+      wrappedRouteHandlerFunction(
+        controller,
+        routeData.routeHandler,
+        afterMiddlewares.length > 0,
+      ),
+      afterMiddlewares,
     );
   },
   OPTIONS: (
@@ -104,9 +184,19 @@ export const expressRoutesMapping: Record<
     controller: ClassType,
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
+    const { afterMiddlewares, beforeMiddlewares } = getMiddlewaresForRoute(
+      controller,
+      routeData.routeHandler,
+    );
     app.options(
       routeData.fullRoutePath,
-      wrappedRouteHandlerFunction(controller, routeData.routeHandler),
+      beforeMiddlewares,
+      wrappedRouteHandlerFunction(
+        controller,
+        routeData.routeHandler,
+        afterMiddlewares.length > 0,
+      ),
+      afterMiddlewares,
     );
   },
   PATCH: (
@@ -115,9 +205,19 @@ export const expressRoutesMapping: Record<
     controller: ClassType,
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
+    const { afterMiddlewares, beforeMiddlewares } = getMiddlewaresForRoute(
+      controller,
+      routeData.routeHandler,
+    );
     app.patch(
       routeData.fullRoutePath,
-      wrappedRouteHandlerFunction(controller, routeData.routeHandler),
+      beforeMiddlewares,
+      wrappedRouteHandlerFunction(
+        controller,
+        routeData.routeHandler,
+        afterMiddlewares.length > 0,
+      ),
+      afterMiddlewares,
     );
   },
   POST: (
@@ -126,9 +226,19 @@ export const expressRoutesMapping: Record<
     controller: ClassType,
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
+    const { afterMiddlewares, beforeMiddlewares } = getMiddlewaresForRoute(
+      controller,
+      routeData.routeHandler,
+    );
     app.post(
       routeData.fullRoutePath,
-      wrappedRouteHandlerFunction(controller, routeData.routeHandler),
+      beforeMiddlewares,
+      wrappedRouteHandlerFunction(
+        controller,
+        routeData.routeHandler,
+        afterMiddlewares.length > 0,
+      ),
+      afterMiddlewares,
     );
   },
   PUT: (
@@ -137,9 +247,19 @@ export const expressRoutesMapping: Record<
     controller: ClassType,
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
+    const { afterMiddlewares, beforeMiddlewares } = getMiddlewaresForRoute(
+      controller,
+      routeData.routeHandler,
+    );
     app.put(
       routeData.fullRoutePath,
-      wrappedRouteHandlerFunction(controller, routeData.routeHandler),
+      beforeMiddlewares,
+      wrappedRouteHandlerFunction(
+        controller,
+        routeData.routeHandler,
+        afterMiddlewares.length > 0,
+      ),
+      afterMiddlewares,
     );
   },
   TRACE: (
@@ -148,9 +268,19 @@ export const expressRoutesMapping: Record<
     controller: ClassType,
     routeData: Readonly<IExpressRouterMappingRouteData>,
   ) => {
+    const { afterMiddlewares, beforeMiddlewares } = getMiddlewaresForRoute(
+      controller,
+      routeData.routeHandler,
+    );
     app.trace(
       routeData.fullRoutePath,
-      wrappedRouteHandlerFunction(controller, routeData.routeHandler),
+      beforeMiddlewares,
+      wrappedRouteHandlerFunction(
+        controller,
+        routeData.routeHandler,
+        afterMiddlewares.length > 0,
+      ),
+      afterMiddlewares,
     );
   },
 };

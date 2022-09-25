@@ -11,13 +11,13 @@ export const enum SWAGGER_METADATA_DECORATOR_METADATA_ENUM {
   DEPRECATED = "__swagger_docs.swagger_metadata_decorator.deprecated__",
   SECURITY = "__swagger_docs.swagger_metadata_decorator.security__",
   SERVERS = "__swagger_docs.swagger_metadata_decorator.servers__",
-  MIDDLEWARE = "__swagger_docs.swagger_metadata_decorator.middleware__",
   ROUTE_METADATA = "__swagger_docs.swagger_metadata_decorator.route_metadata__",
 }
 
 export const enum ROUTE_DECORATOR_METADATA_ENUM {
   RESPONSE_BODY = "__swagger_docs.route_decorator.response_body__",
   REQUEST_BODY = "__swagger_docs.route_decorator.request_body__",
+  MIDDLEWARE = "__swagger_docs.route_decorator.middleware__",
 }
 
 export const enum DECORATOR_METADATA_ENUM {
