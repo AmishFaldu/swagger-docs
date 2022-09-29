@@ -2,12 +2,14 @@ import type { Express, Request, Response } from "express";
 import * as fs from "fs";
 import { access } from "fs/promises";
 import { absolutePath } from "swagger-ui-dist";
+import { AppConfig } from "./app-config";
 import {
   favIconsString,
   htmlString,
   jsString,
 } from "./constants/swagger.constants";
 import {
+  ClassType,
   DeepReadonly,
   IBuildSwaggerHtml,
   IBuildSwaggerJS,
@@ -23,14 +25,19 @@ export class SwaggerDocs {
 
   private formattedSwaggerJs: string;
 
+  private controllers: Readonly<ClassType[]>;
+
+  private readonly appConfig: AppConfig;
+
   private readonly swaggerUIDistAbsolutePath: string;
 
   private readonly swaggerUIConfig: ISwaggerUIConfig;
 
   constructor(
-    private readonly swaggerConfig: DeepReadonly<ISwaggerConfig>,
+    private swaggerConfig: DeepReadonly<Omit<ISwaggerConfig, "paths">>,
     swaggerUIConfig: Readonly<ISwaggerUIConfig> = {},
   ) {
+    this.appConfig = new AppConfig(swaggerConfig);
     this.swaggerUIConfig = this.addDefaultsToSwaggerUIConfig(swaggerUIConfig);
     this.swaggerUIDistAbsolutePath = absolutePath();
   }
@@ -44,13 +51,10 @@ export class SwaggerDocs {
   public setup(app: Express, path: Readonly<string>): void {
     const baseUrl = this.getFormattedPath(path);
     const formattedFavIconsString = this.buildSwaggerFavIcons(baseUrl);
+    this.setupSwaggerExpress(app, path);
 
-    this.formattedSwaggerJs = this.buildSwaggerJs({
-      displayRequestDuration: this.swaggerUIConfig.displayRequestDuration,
-      filter: this.swaggerUIConfig.filter,
-      spec: JSON.stringify(this.swaggerConfig),
-      tryItOutEnabled: this.swaggerUIConfig.tryItOutEnabled,
-    });
+    this.appConfig.bootstrapControllersToApp(app, this.controllers);
+    this.swaggerConfig = this.appConfig.getSwaggerDocument();
 
     this.formattedSwaggerHtml = this.buildSwaggerHtml({
       customTitle: this.swaggerUIConfig.customTitle,
@@ -62,7 +66,22 @@ export class SwaggerDocs {
       customJsString: this.swaggerUIConfig.customJsString,
     });
 
-    this.setupSwaggerExpress(app, path);
+    this.formattedSwaggerJs = this.buildSwaggerJs({
+      displayRequestDuration: this.swaggerUIConfig.displayRequestDuration,
+      filter: this.swaggerUIConfig.filter,
+      spec: JSON.stringify(this.swaggerConfig),
+      tryItOutEnabled: this.swaggerUIConfig.tryItOutEnabled,
+    });
+  }
+
+  /**
+   * Bootstrap controllers to app
+   * @param controllers - List of controller class
+   * @returns Swagger docs instance
+   */
+  public bootstrapControllersToApp(controllers: Readonly<ClassType[]>): this {
+    this.controllers = controllers;
+    return this;
   }
 
   /**

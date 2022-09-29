@@ -139,6 +139,10 @@ function generateSwaggerRequestBody(
     fileSchema = getFileSchema(controller, routeHandlerName);
   }
 
+  if (schema === undefined && fileSchema === undefined) {
+    return undefined;
+  }
+
   const swaggerRequestBodySchema: ISwaggerSchema = {
     allOf: [],
   };
@@ -162,7 +166,7 @@ function generateSwaggerRequestBody(
   const swaggerRequestBody: ISwaggerRequestBody = {
     content: {
       [contentType]: {
-        schema: fileSchema,
+        schema: swaggerRequestBodySchema,
         // examples: {},
       },
     },

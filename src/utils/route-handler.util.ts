@@ -312,7 +312,7 @@ export function processRouteBody(
 /* eslint-enable no-invalid-this */
 
 /**
- * Generate swagger file schema
+ * Generate swagger schema for file upload in route handler
  * @param controller - Controller class
  * @param routeHandlerName - Route handler method name
  * @returns Swagger schema
@@ -320,7 +320,7 @@ export function processRouteBody(
 export const getFileSchema = (
   controller: ClassType,
   routeHandlerName: string,
-): ISwaggerSchema => {
+): ISwaggerSchema | undefined => {
   const swaggerFileSchema: ISwaggerSchema = {
     type: "object",
   };
@@ -331,7 +331,7 @@ export const getFileSchema = (
       routeHandlerName,
     );
   if (!routeArgsMappging) {
-    return swaggerFileSchema;
+    return undefined;
   }
   const fileArgIndexes = Object.keys(routeArgsMappging).filter((index) => {
     const arg = routeArgsMappging[index];
@@ -340,6 +340,10 @@ export const getFileSchema = (
     }
     return false;
   });
+  if (fileArgIndexes.length <= 0) {
+    return undefined;
+  }
+
   fileArgIndexes.forEach((fileArgIndex) => {
     const fileArg = routeArgsMappging[
       fileArgIndex
