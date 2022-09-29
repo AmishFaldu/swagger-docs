@@ -20,6 +20,7 @@ import {
   RouteHandlerMethods,
 } from "../interfaces";
 import {
+  getFileSchema,
   getReferenceSchema,
   processRouteBody,
 } from "../utils/route-handler.util";
@@ -112,11 +113,9 @@ function generateSwaggerRequestBody(
     }
     return false;
   });
-  if (bodyArgIndex === undefined) {
-    return undefined;
-  }
 
-  let schema: ISwaggerReferenceSchema | ISwaggerSchema | undefined;
+  let schema: ISwaggerReferenceSchema | ISwaggerSchema | undefined = undefined;
+  let fileSchema: ISwaggerSchema | undefined;
   schema = processRouteBody.call(
     this,
     ROUTE_DECORATOR_METADATA_ENUM.REQUEST_BODY,
@@ -132,13 +131,38 @@ function generateSwaggerRequestBody(
       controller.prototype,
       routeHandlerName,
     );
-    const bodyReturnType = returnTypes[parseInt(bodyArgIndex, 10)];
-    schema = getReferenceSchema.call(this, bodyReturnType);
+
+    if (bodyArgIndex !== undefined) {
+      const bodyReturnType = returnTypes[parseInt(bodyArgIndex, 10)];
+      schema = getReferenceSchema.call(this, bodyReturnType);
+    }
+    fileSchema = getFileSchema(controller, routeHandlerName);
   }
+
+  const swaggerRequestBodySchema: ISwaggerSchema = {
+    allOf: [],
+  };
+  if (schema) {
+    swaggerRequestBodySchema.allOf = [
+      ...(swaggerRequestBodySchema.allOf ?? []),
+      schema,
+    ];
+  }
+  if (fileSchema) {
+    swaggerRequestBodySchema.allOf = [
+      ...(swaggerRequestBodySchema.allOf ?? []),
+      fileSchema,
+    ];
+  }
+
+  const contentType =
+    fileSchema === undefined
+      ? "application/json"
+      : "multipart/form-data";
   const swaggerRequestBody: ISwaggerRequestBody = {
     content: {
-      "application/json": {
-        schema,
+      [contentType]: {
+        schema: fileSchema,
         // examples: {},
       },
     },

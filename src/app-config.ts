@@ -95,9 +95,12 @@ export class AppConfig {
           return;
         }
 
+        // We are replacing any occurence of "//" in the route path that might occur
+        // while formatting route names. For example this will occur when we pass empty
+        // router path and empty route method path
         const fullRoutePath = `${controllerRoutePath}${this.formatRoutePath(
           routeHandlerMetadata.path,
-        )}`;
+        )}`.replace(/\/\//g, "/");
         this.addRouteToExpressApp(app, controller, {
           fullRoutePath,
           routeHandlerName,
@@ -131,9 +134,10 @@ export class AppConfig {
     formattedRoute = formattedRoute.startsWith("/")
       ? formattedRoute
       : `/${formattedRoute}`;
-    formattedRoute = formattedRoute.endsWith("/")
-      ? formattedRoute.slice(0, -1)
-      : formattedRoute;
+    formattedRoute =
+      formattedRoute.length > 1 && formattedRoute.endsWith("/")
+        ? formattedRoute.slice(0, -1)
+        : formattedRoute;
     return formattedRoute;
   }
 

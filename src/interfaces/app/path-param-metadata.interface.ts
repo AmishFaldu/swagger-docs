@@ -5,8 +5,6 @@ export interface IPathParamMetadata {
 }
 
 export type DataRouteArgType =
-  | DECORATOR_METADATA_ENUM.FILE
-  | DECORATOR_METADATA_ENUM.FILES
   | DECORATOR_METADATA_ENUM.HEADER
   | DECORATOR_METADATA_ENUM.PATH_PARAM
   | DECORATOR_METADATA_ENUM.QUERY_PARAM;
@@ -22,8 +20,17 @@ export interface IDataRouteArgMetadata {
   data: IPathParamMetadata;
 }
 
+export interface IFileDataRouteArgMetadata {
+  type: DECORATOR_METADATA_ENUM.FILE;
+  data: IPathParamMetadata;
+  options?: { minFiles?: number; maxFiles?: number };
+}
+
 export interface INoDataRouteArgMetadata {
   type: NonDataRouteArgType;
 }
 
-export type IRouteArgMetadata = IDataRouteArgMetadata | INoDataRouteArgMetadata;
+export type IRouteArgMetadata =
+  | IDataRouteArgMetadata
+  | IFileDataRouteArgMetadata
+  | INoDataRouteArgMetadata;
