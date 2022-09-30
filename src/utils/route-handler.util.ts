@@ -8,6 +8,7 @@ import {
   ClassType,
   DeepReadonly,
   EnumForType,
+  IFileDataRouteArgMetadata,
   IRouteArgMetadata,
   IRouteBody,
   IRouterHandlerArgs,
@@ -44,9 +45,13 @@ const fetchRouteArgValue = (
       return res;
     case DECORATOR_METADATA_ENUM.NEXT:
       return next;
-    case DECORATOR_METADATA_ENUM.FILE:
-    case DECORATOR_METADATA_ENUM.FILES:
-      return req[argDetails.data.paramname];
+    case DECORATOR_METADATA_ENUM.FILE: {
+      const file =
+        req.files === undefined
+          ? undefined
+          : req.files[argDetails.data.paramname];
+      return file;
+    }
     case DECORATOR_METADATA_ENUM.HEADER:
       return req.header[argDetails.data.paramname];
     default:
@@ -305,3 +310,68 @@ export function processRouteBody(
   return swaggerSchema;
 }
 /* eslint-enable no-invalid-this */
+
+/**
+ * Generate swagger schema for file upload in route handler
+ * @param controller - Controller class
+ * @param routeHandlerName - Route handler method name
+ * @returns Swagger schema
+ */
+export const getFileSchema = (
+  controller: ClassType,
+  routeHandlerName: string,
+): ISwaggerSchema | undefined => {
+  const swaggerFileSchema: ISwaggerSchema = {
+    type: "object",
+  };
+  const routeArgsMappging: Record<string, IRouteArgMetadata> | undefined =
+    Reflect.getMetadata(
+      DECORATOR_METADATA_ENUM.ROUTE_HANDLER_ARGS,
+      controller.prototype,
+      routeHandlerName,
+    );
+  if (!routeArgsMappging) {
+    return undefined;
+  }
+  const fileArgIndexes = Object.keys(routeArgsMappging).filter((index) => {
+    const arg = routeArgsMappging[index];
+    if (arg.type === DECORATOR_METADATA_ENUM.FILE) {
+      return true;
+    }
+    return false;
+  });
+  if (fileArgIndexes.length <= 0) {
+    return undefined;
+  }
+
+  fileArgIndexes.forEach((fileArgIndex) => {
+    const fileArg = routeArgsMappging[
+      fileArgIndex
+    ] as IFileDataRouteArgMetadata;
+
+    if ((fileArg.options?.maxFiles ?? 1) > 1) {
+      swaggerFileSchema.properties = {
+        ...(swaggerFileSchema.properties ?? {}),
+        [fileArg.data.paramname]: {
+          type: "array",
+          items: {
+            type: "string",
+            format: "binary",
+          },
+          maxItems: fileArg.options?.maxFiles,
+          minItems: fileArg.options?.minFiles,
+        },
+      };
+    } else {
+      swaggerFileSchema.properties = {
+        ...(swaggerFileSchema.properties ?? {}),
+        [fileArg.data.paramname]: {
+          type: "string",
+          format: "binary",
+        },
+      };
+    }
+  });
+
+  return swaggerFileSchema;
+};

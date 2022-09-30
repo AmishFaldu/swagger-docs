@@ -69,7 +69,7 @@ const wrappedRouteHandlerFunction = (
 ): RequestHandler => {
   return async (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-    req: Request,
+    req: Request & { files?: any[] },
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     res: Response,
     next: NextFunction,

@@ -9,7 +9,7 @@ export interface IBootstrapControllerRoute {
 }
 
 export interface IRouterHandlerArgs {
-  req: Request;
+  req: Request & { files?: any[] };
   res: Response;
   next: NextFunction;
 }

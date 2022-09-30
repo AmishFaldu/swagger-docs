@@ -3,6 +3,7 @@ import { DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
 import {
   DeepReadonly,
   IDataRouteArgMetadata,
+  IFileDataRouteArgMetadata,
   INoDataRouteArgMetadata,
   IPathParamMetadata,
   IRouteArgMetadata,
@@ -38,6 +39,8 @@ const paramDecorator = (paramDetails: DeepReadonly<IRouteArgMetadata>) => {
       routeArgMetadata = {
         type: paramDetails.type,
       } as INoDataRouteArgMetadata;
+    } else if (paramDetails.type === DECORATOR_METADATA_ENUM.FILE) {
+      routeArgMetadata = paramDetails;
     } else {
       routeArgMetadata = {
         type: paramDetails.type,
@@ -139,28 +142,20 @@ export const Next = (): ((
  * @param fieldname - Field name of request in which file object will be present
  * @returns Parameter decorator
  */
-export const File = (fieldname: string): ParameterDecorator => {
+export const File = (
+  fieldname: string,
+  options: Readonly<IFileDataRouteArgMetadata["options"]> = {
+    minFiles: 1,
+    maxFiles: 1,
+  },
+): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname: fieldname,
   };
   return paramDecorator({
     type: DECORATOR_METADATA_ENUM.FILE,
     data: pathParamMetadata,
-  });
-};
-
-/**
- * Files from request decorator
- * @param fieldname - Field name of request in which files array will be present
- * @returns Parameter decorator
- */
-export const Files = (fieldname: string): ParameterDecorator => {
-  const pathParamMetadata: IPathParamMetadata = {
-    paramname: fieldname,
-  };
-  return paramDecorator({
-    type: DECORATOR_METADATA_ENUM.FILES,
-    data: pathParamMetadata,
+    options,
   });
 };
 

@@ -33,6 +33,5 @@ export const enum DECORATOR_METADATA_ENUM {
   RESPONSE = "__swagger_docs.decorator.route.response__",
   NEXT = "__swagger_docs.decorator.route.next__",
   FILE = "__swagger_docs.decorator.route.file__",
-  FILES = "__swagger_docs.decorator.route.files__",
   HEADER = "__swagger_docs.decorator.route.header__",
 }
