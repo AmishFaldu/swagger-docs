@@ -2,9 +2,15 @@
 
 This library helps you to build swagger api docs hassle free by using decorators, reflect metadata api.
 
+## Documentation
+
+For more information related to library usage and api references, head over to project's [documentation](https://github.com/AmishFaldu/swagger-docs/wiki).
+
+To find answers for your question, ask questions, add suggestions or ideas to improve this project, engage in general discussion head over to project's [discussion](https://github.com/AmishFaldu/swagger-docs/discussions).
+
 ## Current state / problems faced
 
-To write swagger api docs for an app developed using purely node.js without use of any frameworks like nest.js, you will need to write annotated jsdoc and scroll though confusing swagger docs pages to find right syntax for the api
+To write swagger api docs for web apps developed using node.js without use of frameworks like nest.js, you will need to write annotated jsdoc and scroll though confusing swagger documentation to find right specification syntax for api routes.
 
 ## Problems solved
 
