@@ -4,9 +4,12 @@
 name: Publish package to npm registry
 
 on:
-  workflow_dispatch
+  push:
+    branches:
+      - chore/publish-package
+  # workflow_dispatch
   # release:
-    # types: [created] 
+  # types: [created]
 
 jobs:
   build:
@@ -31,7 +34,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://npm.pkg.github.com/
-          scope: '@amishfaldu'
+          scope: "@amishfaldu"
       - run: npm ci
       - run: npm run build
       - run: npm publish
