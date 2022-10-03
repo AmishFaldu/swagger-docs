@@ -4,12 +4,7 @@
 name: Publish package to npm registry
 
 on:
-  push:
-    branches:
-      - chore/publish-package
-  # workflow_dispatch
-  # release:
-  # types: [created]
+  workflow_dispatch
 
 jobs:
   publish-gpr:
