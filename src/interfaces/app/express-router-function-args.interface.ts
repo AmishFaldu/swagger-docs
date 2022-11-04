@@ -6,6 +6,7 @@ export interface IBootstrapControllerRoute {
   fullRoutePath: string;
   routeMethod: RouteHandlerMethods;
   routeHandlerName: string;
+  routeHandler: RouteHandlerFunctionType;
 }
 
 export interface IRouterHandlerArgs {
@@ -16,5 +17,6 @@ export interface IRouterHandlerArgs {
 
 export interface IExpressRouterMappingRouteData {
   fullRoutePath: string;
+  routeHandlerName: string;
   routeHandler: RouteHandlerFunctionType;
 }

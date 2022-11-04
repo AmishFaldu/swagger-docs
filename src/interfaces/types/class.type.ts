@@ -1,1 +1,1 @@
-export type ClassType<T = unknown> = new (...args: unknown[]) => T;
+export type ClassType<T = any> = new (...args: unknown[]) => T;

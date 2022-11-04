@@ -64,7 +64,7 @@ const getMiddlewaresForRoute = (
  */
 const wrappedRouteHandlerFunction = (
   controller: ClassType,
-  routeHandler: RouteHandlerFunctionType,
+  routeData: Readonly<IExpressRouterMappingRouteData>,
   hasAfterMiddlewares: boolean,
 ): RequestHandler => {
   return async (
@@ -77,14 +77,16 @@ const wrappedRouteHandlerFunction = (
     try {
       const routeHandlerArgs = generateRouteHandlerArgs(
         controller,
-        routeHandler.name,
+        routeData.routeHandlerName,
         {
           req,
           res,
           next,
         },
       );
-      const response = await routeHandler(...routeHandlerArgs);
+      const response = await routeData.routeHandler(
+        ...routeHandlerArgs,
+      );
       if (hasAfterMiddlewares) {
         // eslint-disable-next-line require-atomic-updates
         res.locals.data = response;
@@ -130,7 +132,7 @@ export const expressRoutesMapping: Record<
       beforeMiddlewares,
       wrappedRouteHandlerFunction(
         controller,
-        routeData.routeHandler,
+        routeData,
         afterMiddlewares.length > 0,
       ),
       afterMiddlewares,
@@ -151,7 +153,7 @@ export const expressRoutesMapping: Record<
       beforeMiddlewares,
       wrappedRouteHandlerFunction(
         controller,
-        routeData.routeHandler,
+        routeData,
         afterMiddlewares.length > 0,
       ),
       afterMiddlewares,
@@ -172,7 +174,7 @@ export const expressRoutesMapping: Record<
       beforeMiddlewares,
       wrappedRouteHandlerFunction(
         controller,
-        routeData.routeHandler,
+        routeData,
         afterMiddlewares.length > 0,
       ),
       afterMiddlewares,
@@ -193,7 +195,7 @@ export const expressRoutesMapping: Record<
       beforeMiddlewares,
       wrappedRouteHandlerFunction(
         controller,
-        routeData.routeHandler,
+        routeData,
         afterMiddlewares.length > 0,
       ),
       afterMiddlewares,
@@ -214,7 +216,7 @@ export const expressRoutesMapping: Record<
       beforeMiddlewares,
       wrappedRouteHandlerFunction(
         controller,
-        routeData.routeHandler,
+        routeData,
         afterMiddlewares.length > 0,
       ),
       afterMiddlewares,
@@ -235,7 +237,7 @@ export const expressRoutesMapping: Record<
       beforeMiddlewares,
       wrappedRouteHandlerFunction(
         controller,
-        routeData.routeHandler,
+        routeData,
         afterMiddlewares.length > 0,
       ),
       afterMiddlewares,
@@ -256,7 +258,7 @@ export const expressRoutesMapping: Record<
       beforeMiddlewares,
       wrappedRouteHandlerFunction(
         controller,
-        routeData.routeHandler,
+        routeData,
         afterMiddlewares.length > 0,
       ),
       afterMiddlewares,
@@ -277,7 +279,7 @@ export const expressRoutesMapping: Record<
       beforeMiddlewares,
       wrappedRouteHandlerFunction(
         controller,
-        routeData.routeHandler,
+        routeData,
         afterMiddlewares.length > 0,
       ),
       afterMiddlewares,

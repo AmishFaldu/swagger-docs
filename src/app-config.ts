@@ -79,6 +79,7 @@ export class AppConfig {
     controllers: Readonly<ClassType[]>,
   ): void {
     for (const controller of controllers) {
+      const controllerInstance = new controller();
       const controllerRoutePath = this.getControllerRoutePath(controller);
       const routeHandlersNames = Object.keys(
         Object.getOwnPropertyDescriptors(controller.prototype),
@@ -105,12 +106,14 @@ export class AppConfig {
           fullRoutePath,
           routeHandlerName,
           routeMethod: routeHandlerMetadata.method,
+          routeHandler: controllerInstance[routeHandlerName].bind(controllerInstance),
         });
 
         this.addRouteToSwagger(controller, {
           fullRoutePath,
           routeHandlerName,
           routeMethod: routeHandlerMetadata.method,
+          routeHandler: controllerInstance[routeHandlerName].bind(controllerInstance),
         });
       });
     }
@@ -170,10 +173,12 @@ export class AppConfig {
     controller: ClassType,
     routeDetails: Readonly<IBootstrapControllerRoute>,
   ) {
-    const { fullRoutePath, routeMethod, routeHandlerName } = routeDetails;
+    const { fullRoutePath, routeMethod, routeHandlerName, routeHandler } =
+      routeDetails;
     expressRoutesMapping[routeMethod](app, controller, {
       fullRoutePath,
-      routeHandler: controller.prototype[routeHandlerName],
+      routeHandler,
+      routeHandlerName,
     });
   }
 
