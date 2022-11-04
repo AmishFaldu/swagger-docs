@@ -57,7 +57,7 @@ const getMiddlewaresForRoute = (
 /**
  * Wrapper around route handler functions to better handler response and exceptions
  * @param controller - Controller class
- * @param routeHandler - Route handler function defined in controller class
+ * @param routeData - Route handler data
  * @param hasAfterMiddlewares - Boolean indicating whether this route handler
  * will execute middlewares function after executing itself
  * @returns A wrapped request handler function
