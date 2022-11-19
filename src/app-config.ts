@@ -106,14 +106,16 @@ export class AppConfig {
           fullRoutePath,
           routeHandlerName,
           routeMethod: routeHandlerMetadata.method,
-          routeHandler: controllerInstance[routeHandlerName].bind(controllerInstance),
+          routeHandler:
+            controllerInstance[routeHandlerName].bind(controllerInstance),
         });
 
         this.addRouteToSwagger(controller, {
           fullRoutePath,
           routeHandlerName,
           routeMethod: routeHandlerMetadata.method,
-          routeHandler: controllerInstance[routeHandlerName].bind(controllerInstance),
+          routeHandler:
+            controllerInstance[routeHandlerName].bind(controllerInstance),
         });
       });
     }
@@ -208,6 +210,9 @@ export class AppConfig {
         return `{${param.slice(1)}}`;
       })
       .slice(0, -1);
-    this.swaggerConfig.paths[swaggerRoutePath] = swaggerPathItemObject;
+    this.swaggerConfig.paths[swaggerRoutePath] = {
+      ...this.swaggerConfig.paths[swaggerRoutePath],
+      ...swaggerPathItemObject,
+    };
   }
 }
