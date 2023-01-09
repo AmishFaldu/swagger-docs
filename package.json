@@ -1,6 +1,6 @@
 {
   "name": "@amishfaldu/swagger-docs",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A node.js package to create swagger api docs hassle free",
   "main": "./dist/index.js",
   "scripts": {
