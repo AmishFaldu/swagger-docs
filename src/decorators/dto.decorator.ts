@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { deepCopyObject } from "../utils/helper-function.util";
 import { DTO_DECORATOR_METADATA_ENUM } from "../constants/decorator.constants";
 import {
   ClassType,
@@ -79,9 +80,16 @@ const addPropertyToSwaggerSchema = ({
       Reflect.getMetadata(DTO_DECORATOR_METADATA_ENUM.DTO_SCHEMA, target);
 
     const objectType = Reflect.getMetadata("design:type", target, property);
-    const swaggerSchema: ISwaggerSchema = exsitingSwaggerSchema ?? {
-      type: "object",
-    };
+
+    // We want to deep copy the schema object and after then assign to reflect metadata
+    // This will make sure that base classes with child extends don't get properties of child class
+    // P.S. - Don't remove the deep copy unless you know what you're doing.
+    // Reference issue - https://github.com/rbuckton/reflect-metadata/issues/62
+    const swaggerSchema: ISwaggerSchema = deepCopyObject(
+      exsitingSwaggerSchema ?? {
+        type: "object",
+      },
+    );
 
     swaggerSchema.properties = swaggerSchema.properties ?? {};
     swaggerSchema.properties[property] = {
