@@ -70,12 +70,14 @@ const generateSwaggerApiParameters = (
         ...swaggerParameterBase,
         in: "query",
         name: routeArg.data.paramname,
+        required: routeArg.data.required,
       });
     } else if (routeArg.type === DECORATOR_METADATA_ENUM.HEADER) {
       swaggerParameters.push({
         ...swaggerParameterBase,
         in: "header",
         name: routeArg.data.paramname,
+        required: routeArg.data.required,
       });
     }
   });
@@ -92,7 +94,6 @@ const generateSwaggerApiParameters = (
 /* eslint-disable no-invalid-this */
 // eslint-disable-next-line func-style
 function generateSwaggerRequestBody(
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   this: AppConfig,
   controller: ClassType,
   routeHandlerName: string,
@@ -160,9 +161,7 @@ function generateSwaggerRequestBody(
   }
 
   const contentType =
-    fileSchema === undefined
-      ? "application/json"
-      : "multipart/form-data";
+    fileSchema === undefined ? "application/json" : "multipart/form-data";
   const swaggerRequestBody: ISwaggerRequestBody = {
     content: {
       [contentType]: {
@@ -186,7 +185,6 @@ function generateSwaggerRequestBody(
 /* eslint-disable no-invalid-this */
 // eslint-disable-next-line func-style
 function generateSwaggerResponses(
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   this: AppConfig,
   controller: ClassType,
   routeHandlerName: string,
@@ -270,7 +268,6 @@ const getRouteMetadata = (
 /* eslint-disable no-invalid-this */
 // eslint-disable-next-line func-style
 function generateSwaggerPathOperation(
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   this: AppConfig,
   controller: ClassType,
   routeHandlerName: string,

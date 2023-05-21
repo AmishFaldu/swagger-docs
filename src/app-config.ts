@@ -74,7 +74,6 @@ export class AppConfig {
    * @param controllers - List of controller classes
    */
   public bootstrapControllersToApp(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     app: Express,
     controllers: Readonly<ClassType[]>,
   ): void {
@@ -170,7 +169,6 @@ export class AppConfig {
    */
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   private addRouteToExpressApp(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     app: Express,
     controller: ClassType,
     routeDetails: Readonly<IBootstrapControllerRoute>,

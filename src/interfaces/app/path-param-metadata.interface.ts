@@ -2,6 +2,7 @@ import { DECORATOR_METADATA_ENUM } from "../../constants/decorator.constants";
 
 export interface IPathParamMetadata {
   paramname: string;
+  required?: boolean;
 }
 
 export type DataRouteArgType =
@@ -23,7 +24,7 @@ export interface IDataRouteArgMetadata {
 export interface IFileDataRouteArgMetadata {
   type: DECORATOR_METADATA_ENUM.FILE;
   data: IPathParamMetadata;
-  options?: { minFiles?: number; maxFiles?: number };
+  options?: { minFiles?: number; maxFiles?: number; required?: boolean };
 }
 
 export interface INoDataRouteArgMetadata {
