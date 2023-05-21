@@ -79,9 +79,15 @@ export const PathParam = (paramname: string): ParameterDecorator => {
  * @param paramname - Query parameter name
  * @returns Parameter decorator
  */
-export const QueryParam = (paramname: string): ParameterDecorator => {
+export const QueryParam = (
+  paramname: string,
+  options: { required?: boolean } = {
+    required: true,
+  },
+): ParameterDecorator => {
   const queryParamMetadata: IPathParamMetadata = {
     paramname,
+    required: options.required ?? true,
   };
   return paramDecorator({
     type: DECORATOR_METADATA_ENUM.QUERY_PARAM,
@@ -93,11 +99,7 @@ export const QueryParam = (paramname: string): ParameterDecorator => {
  * Request body decorator
  * @returns Parameter decorator
  */
-export const Body = (): ((
-  target: Readonly<Record<string, unknown>>,
-  key: string,
-  index: number
-) => void) => {
+export const Body = (): ParameterDecorator => {
   return paramDecorator({ type: DECORATOR_METADATA_ENUM.BODY });
 };
 
@@ -105,11 +107,7 @@ export const Body = (): ((
  * Request Object decorator
  * @returns Parameter decorator
  */
-export const Request = (): ((
-  target: Readonly<Record<string, unknown>>,
-  key: string,
-  index: number
-) => void) => {
+export const Request = (): ParameterDecorator => {
   return paramDecorator({ type: DECORATOR_METADATA_ENUM.REQUEST });
 };
 
@@ -117,11 +115,7 @@ export const Request = (): ((
  * Response object decorator
  * @returns Parameter decorator
  */
-export const Response = (): ((
-  target: Readonly<Record<string, unknown>>,
-  key: string,
-  index: number
-) => void) => {
+export const Response = (): ParameterDecorator => {
   return paramDecorator({ type: DECORATOR_METADATA_ENUM.RESPONSE });
 };
 
@@ -129,11 +123,7 @@ export const Response = (): ((
  * Next function decorator
  * @returns Parameter decorator
  */
-export const Next = (): ((
-  target: Readonly<Record<string, unknown>>,
-  key: string,
-  index: number
-) => void) => {
+export const Next = (): ParameterDecorator => {
   return paramDecorator({ type: DECORATOR_METADATA_ENUM.NEXT });
 };
 
@@ -151,6 +141,7 @@ export const File = (
 ): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname: fieldname,
+    required: options.required ?? true,
   };
   return paramDecorator({
     type: DECORATOR_METADATA_ENUM.FILE,
@@ -164,9 +155,15 @@ export const File = (
  * @param propname - Header property name in request headers object
  * @returns Parameter decorator
  */
-export const Header = (propname: string): ParameterDecorator => {
+export const Header = (
+  propname: string,
+  options: { required?: boolean } = {
+    required: true,
+  },
+): ParameterDecorator => {
   const pathParamMetadata: IPathParamMetadata = {
     paramname: propname,
+    required: options.required ?? true,
   };
   return paramDecorator({
     type: DECORATOR_METADATA_ENUM.HEADER,

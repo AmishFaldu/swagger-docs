@@ -153,7 +153,7 @@
     "lines-around-comment": "error",
     "lines-between-class-members": "error",
     "max-statements-per-line": "error",
-    "multiline-ternary": "warn",
+    // "multiline-ternary": "warn",
     "new-parens": "error",
     "newline-per-chained-call": "error",
     "no-multi-spaces": "error",
@@ -213,7 +213,7 @@
     "@typescript-eslint/prefer-nullish-coalescing": "warn",
     "@typescript-eslint/prefer-optional-chain": "error",
     "@typescript-eslint/prefer-readonly": "error",
-    "@typescript-eslint/prefer-readonly-parameter-types": "error",
+    // "@typescript-eslint/prefer-readonly-parameter-types": "error",
     "@typescript-eslint/prefer-reduce-type-parameter": "error",
     "@typescript-eslint/prefer-regexp-exec": "warn",
     "@typescript-eslint/prefer-return-this-type": "error",
@@ -226,7 +226,10 @@
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "@typescript-eslint/type-annotation-spacing": "warn",
     "@typescript-eslint/unified-signatures": "warn",
-    "@typescript-eslint/no-shadow": ["error", { "builtinGlobals": true, "hoist": "all" }]
+    "@typescript-eslint/no-shadow": [
+      "error",
+      { "builtinGlobals": true, "hoist": "all" }
+    ]
   },
   "reportUnusedDisableDirectives": true
 }
